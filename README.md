@@ -13,7 +13,7 @@ A bilingual (Arabic-first, RTL) daily school attendance platform built with Lara
 | Vice principal (`vice_principal`) | الوكيلة | Absence follow-up, attendance, excuse review, guardian communication, notes and reports (no staff or structure management) |
 | Student affairs (`student_affairs`) | شؤون الطالبات | Grades and classes, students (add, edit, delete, assign to class, Excel import), daily attendance, excuses and guardian contact |
 | Health advisor (`health_guide`) | الموجه الصحي | Views absences, adds and reviews excuses, records health notes |
-| Student counselor (`counselor`) | المرشدة الطلابية | Follows absence causes, counseling notes and guidance plans, guardian contact and reports |
+| Student counselor (`counselor`) | الموجهة الطلابية | Follows absence causes, counseling notes and guidance plans, guardian contact and reports |
 | Guardian (`guardian`) | ولي الأمر | Follows linked children's attendance, sends excuses with attachments, reads shared notes and notifications |
 
 Default grants are seeded once and remain editable from **System settings → Roles**. Every permission is enforced on the server and all school data is scoped to the user's school.

@@ -9,6 +9,7 @@ use App\Settings\SettingsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -81,7 +82,11 @@ class IntegrationController extends Controller
                 }
             }
         } catch (\Throwable $exception) {
-            // Provider exceptions can contain keys or signed URLs; do not expose their text.
+            // Provider exceptions can contain keys or signed URLs; do not expose their text on screen.
+            // The log keeps the reason (with secrets masked) so the administrator can fix the setup.
+            $reason = preg_replace(['/re_[A-Za-z0-9_]+/', '/whsec_[A-Za-z0-9_+\/=]+/', '/AIza[0-9A-Za-z_-]+/'], '[hidden]', $exception->getMessage());
+            Log::warning('Integration test failed', ['provider' => $provider, 'mailer' => config('mail.default'), 'from' => config('mail.from.address'), 'error' => class_basename($exception).': '.mb_substr($reason, 0, 500)]);
+
             return back()->withErrors(['integration' => __('The connection test failed. Check the configuration and try again.')]);
         }
 

@@ -7,7 +7,7 @@ $context=app(\App\School\SchoolContext::class);
 $schoolGroups=[
  ['Dashboard','house','teal',[
   ['Overview','layout-dashboard',route('school.dashboard'),'attendance.view'],
-  ['My children','heart-handshake',route('school.guardian.index'),'guardian.portal'],
+  ['My children','heart-handshake',route('school.guardian.index'),'role:guardian'],
   ['Notifications','bell',route('school.notifications'),'school.access'],
  ]],
  ['Attendance','calendar-check','violet',[
@@ -48,7 +48,7 @@ foreach(\App\Settings\SettingsRegistry::sections() as $section=>$entry) {
 }
 $current=url()->current();
 $isActive=fn($url)=>$current===$url || (str_contains($url,'/manage/') && str_starts_with($current,$url.'/')) || ($url===route('admin.settings','branding') && in_array(request()->route('section'),['icons','cookies','social','styling','fonts'])) || (str_contains($url,'/school/') && str_starts_with($current,$url.'/'));
-$allowed=fn($link)=>$link[3]===null || $user->can($link[3]);
+$allowed=fn($link)=>$link[3]===null || (str_starts_with($link[3],'role:') ? $user->hasRole(substr($link[3],5)) : $user->can($link[3]));
 $inAdmin=request()->routeIs('admin.*');
 $roleName=$user->roles->pluck('name')->first(fn($r)=>in_array($r,['owner',...\App\School\Roles::all()]));
 @endphp

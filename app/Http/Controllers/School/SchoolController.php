@@ -51,7 +51,10 @@ class SchoolController extends Controller
     public function settings()
     {
         $school = $this->context()->school();
-        abort_unless($school, 422, __('Choose a school first.'));
+        if (! $school) {
+            // The system administrator is viewing all schools: let them pick one first.
+            return view('school.choose-school', ['schools' => School::withCount('students')->orderBy('name')->get()]);
+        }
 
         return view('school.settings', ['school' => $school]);
     }

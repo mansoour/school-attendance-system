@@ -1,0 +1,1 @@
+<x-admin-layout><h1>{{ __('System health') }}</h1><p>{{ __('Checks reflect this installation only.') }}</p>@foreach($checks as $name=>$healthy)<div class="panel title-row"><span>{{ __($name) }}</span><strong class="{{ $healthy?'healthy':'attention' }}">{{ $healthy?__('Healthy'):__('Needs attention') }}</strong></div>@endforeach</x-admin-layout>

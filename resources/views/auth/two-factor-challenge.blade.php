@@ -1,0 +1,1 @@
+<x-guest-layout><p>{{ __('Enter your authenticator or recovery code to finish signing in.') }}</p><form method="post" action="{{ route('two-factor.login') }}" class="stack">@csrf<label>{{ __('Authenticator or recovery code') }}<input name="code" required autofocus autocomplete="one-time-code" maxlength="20"></label><button>{{ __('Verify') }}</button></form></x-guest-layout>

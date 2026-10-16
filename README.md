@@ -21,7 +21,14 @@ Default grants are seeded once and remain editable from **System settings → Ro
 ## Features
 
 **Daily follow-up**
-- **Overview** dashboard: role cards, today's absence/late/excused counts, classes not yet taken, monthly absence by class and by grade (donut chart), latest alerts and quick actions.
+- **Role-based dashboard**: every role gets its own view under a colorful greeting header with today's counts.
+  - System administrator, principal, vice principal: role cards, monthly absence by class and by grade (donut chart), latest alerts.
+  - Student affairs: classes still waiting for attendance, quick actions (attendance, students, import, guardian approvals, students without a class).
+  - Health advisor: excuses awaiting review (medical first) and the latest health notes.
+  - Counselor: students with the most absences in the last 30 days and the latest counseling notes.
+  - Guardians go straight to their children's portal.
+- **Hijri dates first**: every date is shown in the Hijri (Umm al-Qura) calendar with the Gregorian date alongside, including date pickers, guardian messages, notifications and Excel/PDF exports.
+- **Grouped sidebar** for every role: Dashboard, Attendance, Follow-up and communication, Reports, School management, My account, and System settings for the administrator. Users only see what their permissions allow.
 - **Attendance tracking**: daily status of every class for any date, with the absent and late students and their excuse status.
 - **Class attendance**: a one-screen register per class (present, absent, late with minutes, excused, note). Attendance is daily, not per lesson; a "class" is a section of a grade (A, B, C…).
 - **Excuses**: guardians submit excuses online (with an optional PDF/image); staff review, approve or reject, or record an excuse received at school. Approval marks the day as excused.
@@ -55,9 +62,15 @@ Default grants are seeded once and remain editable from **System settings → Ro
 
 **Audit** — every create, update and delete of schools, grades, classes, students, attendance, excuses, notes and guardian contacts is recorded, plus imports, exports, account and role changes.
 
-### Starter kit foundation (kept)
+### Platform foundation
 
-All features of the underlying Arabic Laravel SaaS starter kit remain available under **System settings**: Arabic/English RTL interfaces, registration, email verification, password reset, optional MFA, permission-scoped administration, editable roles, branding (names, logos, icons, colors, fonts, dark mode), translation editor, Markdown pages, site notices, mail templates, support inbox, audit history, health checks, optional plans, Resend/Gemini/reCAPTCHA/Cloudflare R2 integrations, queues, scheduler and encrypted backups.
+Available under **System settings**: Arabic/English RTL interfaces, registration, email verification, password reset, optional MFA, permission-scoped administration, editable roles, branding (names, logos, icons, colors, fonts, dark mode), translation editor, Markdown pages (including the About page), site notices, mail templates, support inbox, audit history, health checks, Resend/Gemini/reCAPTCHA/Cloudflare R2 integrations, queues, scheduler and encrypted backups.
+
+SaaS-only parts of the original starter kit that a school does not use (plans, subscriptions, pricing and the separate Vue member workspace) have been removed.
+
+## About
+
+**Idea and innovation:** Ms. Aziza Mohammed Abdullah Al-Qarni · **School:** Fifteenth Primary and Seventh Intermediate School · **Principal:** Ms. Saleha Hajla
 
 ## Requirements
 
@@ -118,7 +131,6 @@ Excuse attachments are stored on the private `local` disk and are only downloada
 
 ```sh
 php artisan test --compact
-npm run typecheck
 npm run build
 php vendor/bin/pint --test
 composer validate --no-check-publish

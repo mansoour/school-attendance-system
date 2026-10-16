@@ -13,7 +13,7 @@
 9. Run `php artisan schedule:run` every minute through your scheduler. Use the release directory as the working directory.
 10. Register/verify an owner, configure email and integrations, review security settings, replace placeholders and check the health page.
 
-The PHP development server is for local use. Plans provide manual access management only; payments, invoices, tax and recurring billing are outside the starter kit.
+The PHP development server is for local use.
 
 ## Backups
 

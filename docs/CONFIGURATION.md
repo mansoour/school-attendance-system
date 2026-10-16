@@ -15,15 +15,13 @@ Register an account, verify its email, and assign ownership using `php artisan s
 | Area | Controls |
 | --- | --- |
 | Security | Registration, email verification, password policy, sessions, lockouts, staff/member MFA, recovery codes, reCAPTCHA |
-| Plans and subscriptions | Enable optional plans, manual subscriptions and feature allowances |
 | Appearance | Default language, default theme and availability of dark mode |
 | Maintenance | Localized downtime message; staff retain sign-in and access |
 | Brand identity | Localized name/logo plus tabs for icons, cookies, social links, colors and fonts |
-| Homepage | Localized heading, description and optional plans section |
+| Homepage | Localized heading and description |
 | Staff alerts | Roles notified about support messages |
 | Roles | Create, rename, change permissions and delete roles; owner is protected |
 
-Plans are off by default. Turning plans off preserves their records and subscriptions, hides pricing and plan administration, and permits enabled features without plan quotas. No checkout or payment processing is implemented.
 
 Mandatory staff MFA is off by default. Accounts that voluntarily enabled MFA still use it at sign-in. Enabling mandatory staff MFA redirects staff to enrollment before administration access. Recovery codes are single use.
 

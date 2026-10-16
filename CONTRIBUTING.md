@@ -6,7 +6,6 @@ Before submitting changes:
 
 ```sh
 php artisan test --compact
-npm run typecheck
 npm run build
 php vendor/bin/pint --test
 composer validate --no-check-publish

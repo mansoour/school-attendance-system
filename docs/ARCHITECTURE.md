@@ -2,7 +2,7 @@
 
 ## Stack
 
-Laravel 13 / PHP 8.3+, Blade and Alpine.js for public/account/admin interfaces, Vue 3 with TypeScript and Pinia for the member workspace, Vite/Tailwind CSS for assets, and SQLite by default. Composer and npm lockfiles pin the dependency graph.
+Laravel 13 / PHP 8.3+, Blade and Alpine.js for public/account/admin interfaces, Vite/Tailwind CSS for assets, and SQLite by default. Composer and npm lockfiles pin the dependency graph.
 
 ## Main areas
 
@@ -11,13 +11,12 @@ Laravel 13 / PHP 8.3+, Blade and Alpine.js for public/account/admin interfaces, 
 | `app/Http/Controllers/Admin` | Settings, content, roles, members, support and operations |
 | `app/Settings` | Typed setting definitions, persisted values and encrypted secrets |
 | `app/Localization` | Locale registry, published catalogs, fallback and missing-phrase tracking |
-| `app/Billing/Entitlements.php` | Optional plan access and atomic monthly allowances |
+
 | `app/Services/Security`, `app/Security` | TOTP, recovery codes and replay protection |
 | `app/Integrations` | Gemini and reCAPTCHA server adapters |
 | `app/Operations` | Health checks and SQLite backup creation |
 | `app/Services/Audit` | Privileged-action audit records |
 | `resources/views` | Shared shell and Blade interfaces |
-| `resources/app` | Member workspace, notifications and preferences |
 | `lang` | English/Arabic source catalogs and framework messages |
 | `database/migrations` | Fresh schema for the standalone application |
 | `database/seeders` | Neutral pages, permissions, roles and optional plan examples |
@@ -49,6 +48,5 @@ Attendance is one record per student per day (`attendance_records` is unique on 
 
 Add reusable settings through `SettingsRegistry`, including validation, defaults, permission and translated labels. Use named routes, the shared layouts and `<x-ui-icon>` in Blade; use `@lucide/vue` in Vue. Directional icons must be mirrored in RTL. Add English and Arabic copy together and preserve translation placeholders.
 
-Use `Entitlements::allows()` / `consume()` for features that need plan access or usage limits. Plans are disabled by default; enabled feature switches remain effective without quotas while plans are off. Add domain features in their own modules and migrations rather than embedding them into generic authentication or administration.
 
 The kit has no tenant isolation model, payment checkout or product-specific business workflow. A future multi-tenant product must introduce and test its own tenant boundaries.

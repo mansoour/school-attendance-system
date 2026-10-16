@@ -152,6 +152,19 @@ nav[role=navigation] a,nav[role=navigation] span>span{border-radius:10px!importa
 footer{border-radius:24px 24px 0 0;background:var(--grad-soft)!important;border-top:1px solid var(--line);padding:28px 32px!important}
 .table-wrap .contact-buttons{flex-wrap:nowrap}
 
+/* Site announcement bar */
+.notice{position:relative;display:flex!important;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:14px auto 0;max-width:1240px;width:calc(100% - 32px);padding:12px 56px 12px 20px;border-radius:18px;border:0!important;color:#fff!important;font-weight:600;font-size:.92rem;line-height:1.6;text-align:center;background:linear-gradient(110deg,#0e9aa7 0%,#6d5df5 50%,#d94fa0 100%)!important;box-shadow:0 10px 28px rgba(109,93,245,.28);overflow:hidden;animation:notice-in .5s ease both}
+html[dir=rtl] .notice{padding:12px 20px 12px 56px}
+.notice::before{content:"📣";display:grid;place-items:center;width:34px;height:34px;flex-shrink:0;border-radius:12px;background:rgba(255,255,255,.2);font-size:1.05rem}
+.notice::after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.1);top:-110px;inset-inline-start:12%;pointer-events:none}
+.notice a{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:999px;background:#fff;color:#6d5df5!important;font-weight:800;font-size:.82rem;text-decoration:none!important;box-shadow:0 4px 12px rgba(0,0,0,.12);transition:transform .15s}
+.notice a:hover{transform:translateY(-1px)}
+.notice button{position:absolute!important;inset-inline-end:12px;top:50%;transform:translateY(-50%);width:32px;height:32px;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.2)!important;color:#fff!important;box-shadow:none!important;display:grid;place-items:center}
+.notice button:hover{background:rgba(255,255,255,.32)!important;transform:translateY(-50%)!important}
+.notice button .icon{width:16px;height:16px}
+@keyframes notice-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media(max-width:640px){.notice{font-size:.84rem;padding:12px 48px 12px 14px}html[dir=rtl] .notice{padding:12px 14px 12px 48px}.notice::before{display:none}}
+
 /* Dashboard hero */
 .hero-panel{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:28px 30px;margin-bottom:20px;border-radius:24px;color:#fff;background:linear-gradient(120deg,#0e9aa7 0%,#6d5df5 55%,#d94fa0 100%);box-shadow:var(--shadow-lg)}
 .hero-panel::before,.hero-panel::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.12)}
@@ -168,11 +181,16 @@ footer{border-radius:24px 24px 0 0;background:var(--grad-soft)!important;border-
 .hero-panel .hijri-hint{color:rgba(255,255,255,.9)}
 .button.light{background:#fff!important;color:#6d5df5!important;box-shadow:0 8px 20px rgba(0,0,0,.15)!important}
 
+button.stat.school-pick{width:100%;background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow-sm)!important;justify-content:flex-start;text-align:start;font-weight:400;cursor:pointer}
+button.stat.school-pick strong{display:block;font-size:1rem}
+button.stat.school-pick span span{display:block;font-size:.78rem;color:var(--muted)}
+
 /* Hijri + Gregorian dates */
-.date-dual{display:inline-flex;flex-direction:column;line-height:1.35}
+.date-dual{display:inline-flex;flex-direction:column;line-height:1.35;white-space:nowrap;vertical-align:middle}
 .date-hijri{font-weight:700;color:inherit}
 .date-greg{font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.hijri-hint{display:block;margin-top:4px;font-size:.72rem;font-weight:600;color:var(--c-violet)}
-.page-actions .hijri-hint,.toolbar .hijri-hint{position:static}
+.field-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;white-space:nowrap}
+.hijri-badge{font-size:.68rem;font-weight:700;color:var(--c-violet);background:color-mix(in srgb,var(--c-violet) 10%,transparent);padding:1px 8px;border-radius:999px;overflow:hidden;text-overflow:ellipsis}
+.hero-panel .hijri-badge{color:#fff;background:rgba(255,255,255,.2)}
 
 @media(max-width:760px){.admin-content{padding:18px 14px}.hero-panel{padding:22px 18px}.page-head{padding:16px}.nav-group:not(.nav-system) a{margin-inline-start:0}}

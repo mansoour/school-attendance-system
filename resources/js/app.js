@@ -16,17 +16,30 @@ function applyTheme(choice) {
 applyTheme(savedTheme() || root.dataset.defaultTheme || 'light');
 
 // Hijri (Umm al-Qura) is the school's main calendar: show it under every Gregorian date picker.
+// The Hijri date goes on the field's caption line (no extra row), or in a tooltip when the field has no caption.
 function hijriLabel(input) {
-    let label = input.nextElementSibling;
-    if (!label || !label.classList.contains('hijri-hint')) {
-        label = document.createElement('small');
-        label.className = 'hijri-hint';
-        input.after(label);
-    }
-    if (!input.value) { label.textContent = ''; return; }
     const lang = root.lang === 'ar' ? 'ar-SA' : 'en';
-    const text = new Intl.DateTimeFormat(lang + '-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' }).format(new Date(input.value + 'T12:00:00'));
-    label.textContent = text + (root.lang === 'ar' ? ' هـ' : ' AH');
+    const text = input.value ? new Intl.DateTimeFormat(lang + '-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(input.value + 'T12:00:00')) + (root.lang === 'ar' ? ' هـ' : ' AH') : '';
+    input.title = text;
+    const label = input.closest('label');
+    if (!label) return;
+    let caption = label.querySelector(':scope > .field-caption');
+    if (!caption) {
+        const textNode = [...label.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+        if (!textNode) return;
+        caption = document.createElement('span');
+        caption.className = 'field-caption';
+        caption.textContent = textNode.textContent.trim();
+        textNode.replaceWith(caption);
+    }
+    let badge = caption.querySelector('.hijri-badge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'hijri-badge';
+        caption.append(badge);
+    }
+    badge.textContent = text;
+    badge.hidden = !text;
 }
 document.querySelectorAll('input[type=date]').forEach(input => {
     hijriLabel(input);

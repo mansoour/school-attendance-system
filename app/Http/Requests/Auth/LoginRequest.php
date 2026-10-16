@@ -72,6 +72,10 @@ class LoginRequest extends FormRequest
 
         RateLimiter::clear($this->throttleKey());
 
+        if (! $user->is_active) {
+            throw ValidationException::withMessages(['email' => __('This account has been deactivated. Contact the school administration.')]);
+        }
+
         if ($user->failed_login_attempts > 0 || $user->locked_until !== null) {
             $user->forceFill(['failed_login_attempts' => 0, 'locked_until' => null])->save();
         }

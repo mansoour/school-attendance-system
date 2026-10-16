@@ -41,7 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/account/export', [MemberController::class, 'export'])->middleware(['verified', 'password.confirm', 'throttle:5,1'])->name('account.export');
 });
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', fn () => redirect('/app'))->name('dashboard');
+    Route::get('/dashboard', fn () => auth()->user()->can('school.access') ? redirect()->route('school.dashboard') : redirect('/app'))->name('dashboard');
     Route::view('/app/{path?}', 'member')->where('path', '.*')->name('member');
     Route::prefix('/api/v1')->group(function () {
         Route::get('/me', [MemberController::class, 'me']);
@@ -88,4 +88,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'can:adm
     Route::post('/manage/{resource}/{id?}', [ResourceController::class, 'save'])->middleware('plans.enabled')->name('resources.save');
     Route::delete('/manage/{resource}/{id}', [ResourceController::class, 'destroy'])->middleware('plans.enabled')->name('resources.delete');
 });
+require __DIR__.'/school.php';
 require __DIR__.'/auth.php';

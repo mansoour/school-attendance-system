@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./school.css";
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @plugin "@tailwindcss/forms";
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";

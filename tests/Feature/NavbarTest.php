@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Settings\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -15,6 +16,8 @@ class NavbarTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        // These starter tests describe the English interface; the product default is Arabic.
+        app(SettingsService::class)->set('appearance.locale', 'en');
     }
 
     public function test_branding_subtabs_are_not_duplicated_in_the_main_menu(): void

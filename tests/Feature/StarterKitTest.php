@@ -32,6 +32,8 @@ class StarterKitTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        // These starter tests describe the English interface; the product default is Arabic.
+        app(SettingsService::class)->set('appearance.locale', 'en');
         Notification::fake();
     }
 
@@ -50,7 +52,7 @@ class StarterKitTest extends TestCase
         foreach (['/', '/pricing', '/contact', '/pages/about', '/pages/help', '/pages/privacy', '/pages/terms'] as $url) {
             $this->get($url)->assertOk();
         }
-        $this->withSession(['locale' => 'ar'])->get('/')->assertOk()->assertSee('dir="rtl"', false)->assertSee('بداية جديدة');
+        $this->withSession(['locale' => 'ar'])->get('/')->assertOk()->assertSee('dir="rtl"', false)->assertSee('بالتواصل نعزز الانتظام');
         $this->get('/api/v1/catalogs/ar')->assertOk()->assertJsonPath('locale', 'ar');
         foreach (['/api/v1/institutions', '/api/v1/applications/university', '/api/v1/extension/session', '/api/v1/profile/education'] as $url) {
             $this->getJson($url)->assertNotFound();

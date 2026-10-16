@@ -27,6 +27,7 @@ Default grants are seeded once and remain editable from **System settings → Ro
   - Health advisor: excuses awaiting review (medical first) and the latest health notes.
   - Counselor: students with the most absences in the last 30 days and the latest counseling notes.
   - Guardians go straight to their children's portal.
+- **Saudi school week**: attendance is recorded Sunday to Thursday only. Friday and Saturday cannot be saved, and daily screens opened on a weekend show the last school day (Thursday). The school days are set in `config/school.php`.
 - **Hijri dates first**: every date is shown in the Hijri (Umm al-Qura) calendar with the Gregorian date alongside, including date pickers, guardian messages, notifications and Excel/PDF exports.
 - **Grouped sidebar** for every role: Dashboard, Attendance, Follow-up and communication, Reports, School management, My account, and System settings for the administrator. Users only see what their permissions allow.
 - **Attendance tracking**: daily status of every class for any date, with the absent and late students and their excuse status.

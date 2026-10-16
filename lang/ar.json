@@ -1136,5 +1136,7 @@
   "Note_shared": "ملاحظة لولي الأمر",
   "Guardian_registered": "تسجيل ولي أمر جديد",
   "Guardian_link_approved": "اعتماد ربط ولي الأمر",
-  "Repeated_absence": "تكرار الغياب"
+  "Repeated_absence": "تكرار الغياب",
+  "Friday and Saturday are the weekend. Showing the last school day.": "الجمعة والسبت عطلة نهاية الأسبوع، ويُعرض آخر يوم دراسي.",
+  "Attendance can only be recorded on school days (Sunday to Thursday).": "يُسجل الحضور في أيام الدراسة فقط (من الأحد إلى الخميس)."
 }

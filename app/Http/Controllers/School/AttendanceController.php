@@ -5,8 +5,10 @@ namespace App\Http\Controllers\School;
 use App\Models\AttendanceRecord;
 use App\Models\Classroom;
 use App\School\AttendanceService;
+use App\School\Calendar;
 use App\School\Stats;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class AttendanceController extends Controller
@@ -14,7 +16,7 @@ class AttendanceController extends Controller
     /** Daily overview: which classes have taken attendance and who is absent. */
     public function index(Request $request, Stats $stats)
     {
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
         $gradeId = $request->integer('grade') ?: null;
         $classes = $stats->byClass($date, $date, $gradeId);
         $records = $this->context()->scope(AttendanceRecord::query())->with('student', 'classroom.grade', 'excuses')
@@ -28,7 +30,7 @@ class AttendanceController extends Controller
     /** Class picker: shows each class with today's progress. */
     public function classes(Request $request, Stats $stats)
     {
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
 
         return view('school.attendance.classes', ['date' => $date, 'classes' => $stats->byClass($date, $date)]);
     }
@@ -37,7 +39,7 @@ class AttendanceController extends Controller
     public function take(Request $request, Classroom $classroom)
     {
         $this->context()->authorize($classroom);
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
         $records = AttendanceRecord::where('classroom_id', $classroom->id)->where('date', $date->toDateString())->get()->keyBy('student_id');
         $previous = $this->classOptions();
 
@@ -54,7 +56,11 @@ class AttendanceController extends Controller
     {
         $this->context()->authorize($classroom);
         $data = $request->validate([
-            'date' => 'required|date|before_or_equal:today',
+            'date' => ['required', 'date', 'before_or_equal:today', function ($attribute, $value, $fail) {
+                if (! Calendar::isSchoolDay(Carbon::parse($value))) {
+                    $fail(__('Attendance can only be recorded on school days (Sunday to Thursday).'));
+                }
+            }],
             'entries' => 'required|array',
             'entries.*.status' => ['required', Rule::in(AttendanceRecord::STATUSES)],
             'entries.*.late_minutes' => 'nullable|integer|min:1|max:600',

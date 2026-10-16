@@ -14,7 +14,7 @@ class CommunicationController extends Controller
     /** Absent and late students for a day, with WhatsApp, call and email shortcuts to their guardians. */
     public function index(Request $request)
     {
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
         $status = in_array($request->query('status'), ['absent', 'late', 'excused'], true) ? [$request->query('status')] : ['absent', 'late'];
         $records = $this->context()->scope(AttendanceRecord::query())->with('student.classroom.grade', 'student.guardians')
             ->where('date', $date->toDateString())->whereIn('status', $status)

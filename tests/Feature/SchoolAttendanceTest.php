@@ -11,11 +11,13 @@ use App\Models\School;
 use App\Models\Student;
 use App\Models\User;
 use App\Notifications\SchoolNotification;
+use App\School\Calendar;
 use App\School\GuardianLinker;
 use App\Settings\SettingsService;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -35,6 +37,8 @@ class SchoolAttendanceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // A fixed Thursday, so attendance can be recorded regardless of the day the suite runs.
+        $this->travelTo(Carbon::parse('2026-10-15 10:00'));
         $this->seed();
         $this->school = School::create(['name' => 'Sample School']);
         $grade = Grade::create(['school_id' => $this->school->id, 'name' => 'Fourth primary', 'stage' => 'primary']);
@@ -107,6 +111,21 @@ class SchoolAttendanceTest extends TestCase
         $this->get('/pages/privacy')->assertOk()->assertSee('سياسة الخصوصية');
         $this->assertDatabaseHas('email_templates', ['event' => 'student_absent', 'is_active' => true]);
         $this->assertDatabaseCount('site_notices', 1);
+    }
+
+    public function test_attendance_is_only_recorded_sunday_to_thursday(): void
+    {
+        $affairs = $this->staff('student_affairs');
+        $friday = '2026-10-16';
+        $this->actingAs($affairs)->post(route('school.attendance.save', $this->classroom), ['date' => '2026-10-10', 'entries' => [$this->student->id => ['status' => 'absent']]])
+            ->assertSessionHasErrors('date');
+        $this->assertDatabaseCount('attendance_records', 0);
+
+        // Weekend pages show the last school day (Thursday) instead.
+        $this->travelTo(Carbon::parse($friday.' 09:00'));
+        $this->get(route('school.attendance.take', $this->classroom))->assertOk()->assertSee('value="2026-10-15"', false);
+        $this->assertTrue(Calendar::isSchoolDay(Carbon::parse('2026-10-11')));
+        $this->assertSame('2026-10-15', Calendar::lastSchoolDay(Carbon::parse('2026-10-17'))->toDateString());
     }
 
     public function test_taking_attendance_notifies_guardians_and_is_audited(): void

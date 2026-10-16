@@ -27,7 +27,7 @@ class DashboardController extends Controller
             return redirect()->route('school.guardian.index');
         }
         $context = $this->context();
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
         $role = $user->isSystemAdmin() ? 'owner' : ($user->roles->pluck('name')->first(fn ($r) => in_array($r, Roles::STAFF, true)) ?? 'principal');
         $mode = match ($role) {
             'student_affairs' => 'affairs',

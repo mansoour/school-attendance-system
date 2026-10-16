@@ -19,7 +19,12 @@ applyTheme(savedTheme() || root.dataset.defaultTheme || 'light');
 // The Hijri date goes on the field's caption line (no extra row), or in a tooltip when the field has no caption.
 function hijriLabel(input) {
     const lang = root.lang === 'ar' ? 'ar-SA' : 'en';
-    const text = input.value ? new Intl.DateTimeFormat(lang + '-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(input.value + 'T12:00:00')) + (root.lang === 'ar' ? ' هـ' : ' AH') : '';
+    let text = input.value ? new Intl.DateTimeFormat(lang + '-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(input.value + 'T12:00:00')) + (root.lang === 'ar' ? ' هـ' : ' AH') : '';
+    // Friday and Saturday are the weekend: no attendance on those days.
+    const weekday = input.value ? new Date(input.value + 'T12:00:00').getDay() : null;
+    const weekend = weekday === 5 || weekday === 6;
+    if (weekend) text += root.lang === 'ar' ? ' · عطلة نهاية الأسبوع' : ' · weekend';
+    input.classList.toggle('is-weekend', weekend);
     input.title = text;
     const label = input.closest('label');
     if (!label) return;

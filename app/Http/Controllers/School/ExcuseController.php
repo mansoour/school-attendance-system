@@ -20,7 +20,7 @@ class ExcuseController extends Controller
             ->latest()->paginate(25)->withQueryString();
 
         // Absences without an excuse, so staff can record one received on paper or by phone.
-        $date = $this->date($request->query('date'));
+        $date = $this->schoolDate($request->query('date'));
         $unexcused = $this->context()->scope(AttendanceRecord::query())->with('student.classroom.grade')
             ->where('date', $date->toDateString())->where('status', 'absent')->whereDoesntHave('excuses')->get();
 

@@ -121,6 +121,18 @@ Select compatible PHP and Node installations on `PATH` before running Composer/n
 
 No default user or password is seeded.
 
+## Deploying to production
+
+1. Server: PHP 8.3+ (PDO, ZIP, GD, intl, mbstring, XML), Composer, Node 22.12+ for the build, HTTPS, document root pointing to `public/`.
+2. `composer install --no-dev --optimize-autoloader && npm ci && npm run build`
+3. `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://your-domain`, `APP_LOCALE=ar`, `APP_TIMEZONE=Asia/Riyadh`, a new `APP_KEY` (`php artisan key:generate`), your database, and a real mail driver (for example Resend: verified domain + API key in **System settings → Integrations**, then `MAIL_MAILER=resend`).
+4. `php artisan starter:install` (new installation) or `php artisan migrate --force` (upgrade, after a backup), then `php artisan storage:link`.
+5. `php artisan optimize` after every release, and `php artisan queue:restart`.
+6. Keep `php artisan queue:work --tries=3 --timeout=90` running under a process manager (emails and notifications are queued), and run `php artisan schedule:run` every minute from cron (backups, health heartbeat).
+7. `php artisan school:admin you@your-domain` to create the system administrator, then add the school, grades, classes, students and staff.
+
+Out of the box, every school notification is on (in-app and email), every notification event has an editable Arabic/English email template (**System settings → Email templates**), a welcome site notice is active (**Site notices**), and the Help, Privacy, Terms and About pages are filled in. See [Deployment, backups and recovery](docs/DEPLOYMENT.md) for backups and restore.
+
 ## Database and content
 
 The repository includes migrations, factories and seeders. **It does not include a populated database, accounts, credentials, uploads or student data.** Seeders add permissions, roles and neutral page placeholders; rerunning them does not overwrite edited role grants.

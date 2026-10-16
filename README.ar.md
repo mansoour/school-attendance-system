@@ -93,6 +93,18 @@ composer run dev
 
 لا توجد حسابات أو كلمات مرور افتراضية، ولا يتضمن المستودع أي بيانات طالبات.
 
+## النشر على الخادم
+
+1. الخادم: PHP 8.3 أو أحدث (مع PDO وZIP وGD وintl وmbstring وXML)، وComposer، وNode 22.12 للبناء، وشهادة HTTPS، ويشير جذر الموقع إلى مجلد `public/`.
+2. `composer install --no-dev --optimize-autoloader && npm ci && npm run build`
+3. ملف `.env`: `APP_ENV=production` و`APP_DEBUG=false` و`APP_URL=https://your-domain` و`APP_LOCALE=ar` و`APP_TIMEZONE=Asia/Riyadh` ومفتاح جديد (`php artisan key:generate`) وقاعدة البيانات، ومزود بريد فعلي (مثل Resend: نطاق موثّق ومفتاح API من **إعدادات النظام ← التكاملات** ثم `MAIL_MAILER=resend`).
+4. `php artisan starter:install` للتثبيت الجديد، أو `php artisan migrate --force` للتحديث بعد أخذ نسخة احتياطية، ثم `php artisan storage:link`.
+5. `php artisan optimize` بعد كل تحديث، ثم `php artisan queue:restart`.
+6. تشغيل `php artisan queue:work --tries=3 --timeout=90` بشكل دائم عبر مدير عمليات (الإشعارات والبريد تعمل عبر الطابور)، وتشغيل `php artisan schedule:run` كل دقيقة عبر cron.
+7. `php artisan school:admin you@your-domain` لإنشاء حساب مدير النظام، ثم إضافة المدرسة والصفوف والفصول والطالبات والمنسوبات.
+
+جاهز افتراضيًا: جميع إشعارات المدرسة مفعّلة (داخل المنصة وبالبريد)، وقوالب بريد عربية وإنجليزية قابلة للتعديل لكل حدث (**إعدادات النظام ← قوالب البريد الإلكتروني**)، وإشعار ترحيبي مفعّل في الموقع (**إشعارات الموقع**)، وصفحات المساعدة والخصوصية والشروط ومن نحن مكتملة.
+
 ## الفحص
 
 ```sh

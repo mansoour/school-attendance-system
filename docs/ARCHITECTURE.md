@@ -29,6 +29,22 @@ Settings are persisted in this application's database; encrypted secrets are app
 
 Queue workers process mail and notifications. The scheduler records a heartbeat and runs backups. Keep each deployment's environment, key, database, cache namespace and storage independent.
 
+## School module
+
+| Location | Responsibility |
+| --- | --- |
+| `app/School/Roles.php` | School permissions and default role grants |
+| `app/School/SchoolContext.php` | Active school resolution and query scoping (`scope()`, `authorize()`) |
+| `app/School/AttendanceService.php` | Saving a class register and announcing absences/late arrivals |
+| `app/School/ExcuseService.php` | Excuse submission and review |
+| `app/School/GuardianLinker.php` | Matching registering guardians to students and activating links |
+| `app/School/Notifier.php` | Event delivery according to the School notifications settings |
+| `app/School/Stats.php`, `StudentImporter.php` | Report aggregates and Excel/CSV import |
+| `app/Http/Controllers/School`, `routes/school.php` | School workspace under `/school` |
+| `resources/views/school` | School screens, sharing the administration sidebar layout |
+
+Attendance is one record per student per day (`attendance_records` is unique on `student_id` + `date`, stored as `Y-m-d`). School models use the `Audited` trait so every create, update and delete is written to the audit log. Staff accounts carry a `school_id`; the owner role (system administrator) selects a school or works across all schools.
+
 ## Extending the kit
 
 Add reusable settings through `SettingsRegistry`, including validation, defaults, permission and translated labels. Use named routes, the shared layouts and `<x-ui-icon>` in Blade; use `@lucide/vue` in Vue. Directional icons must be mirrored in RTL. Add English and Arabic copy together and preserve translation placeholders.

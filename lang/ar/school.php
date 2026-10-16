@@ -3,7 +3,7 @@
 return [
     'roles' => [
         'owner' => 'مدير النظام', 'principal' => 'مديرة المدرسة', 'vice_principal' => 'الوكيلة', 'student_affairs' => 'شؤون الطالبات',
-        'health_guide' => 'الموجه الصحي', 'counselor' => 'الموجهة الطلابية', 'guardian' => 'ولي الأمر',
+        'health_guide' => 'الموجهة الصحية', 'counselor' => 'الموجهة الطلابية', 'guardian' => 'ولي الأمر',
         'support' => 'الدعم الفني', 'translator' => 'مترجم', 'content_reviewer' => 'مراجع المحتوى',
     ],
     'role_descriptions' => [

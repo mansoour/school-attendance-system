@@ -12,7 +12,7 @@ A bilingual (Arabic-first, RTL) daily school attendance platform built with Lara
 | Principal (`principal`) | مديرة المدرسة | Manages the whole school: staff accounts, grades, classes, students, attendance, excuses, reports and activity log |
 | Vice principal (`vice_principal`) | الوكيلة | Absence follow-up, attendance, excuse review, guardian communication, notes and reports (no staff or structure management) |
 | Student affairs (`student_affairs`) | شؤون الطالبات | Grades and classes, students (add, edit, delete, assign to class, Excel import), daily attendance, excuses and guardian contact |
-| Health advisor (`health_guide`) | الموجه الصحي | Views absences, adds and reviews excuses, records health notes |
+| Health advisor (`health_guide`) | الموجهة الصحية | Views absences, adds and reviews excuses, records health notes |
 | Student counselor (`counselor`) | الموجهة الطلابية | Follows absence causes, counseling notes and guidance plans, guardian contact and reports |
 | Guardian (`guardian`) | ولي الأمر | Follows linked children's attendance, sends excuses with attachments, reads shared notes and notifications |
 

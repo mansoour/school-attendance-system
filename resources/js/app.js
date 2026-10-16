@@ -14,6 +14,24 @@ function applyTheme(choice) {
     document.querySelectorAll('button[data-theme-choice]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeChoice === choice)));
 }
 applyTheme(savedTheme() || root.dataset.defaultTheme || 'light');
+
+// Hijri (Umm al-Qura) is the school's main calendar: show it under every Gregorian date picker.
+function hijriLabel(input) {
+    let label = input.nextElementSibling;
+    if (!label || !label.classList.contains('hijri-hint')) {
+        label = document.createElement('small');
+        label.className = 'hijri-hint';
+        input.after(label);
+    }
+    if (!input.value) { label.textContent = ''; return; }
+    const lang = root.lang === 'ar' ? 'ar-SA' : 'en';
+    const text = new Intl.DateTimeFormat(lang + '-u-ca-islamic-umalqura-nu-latn', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' }).format(new Date(input.value + 'T12:00:00'));
+    label.textContent = text + (root.lang === 'ar' ? ' هـ' : ' AH');
+}
+document.querySelectorAll('input[type=date]').forEach(input => {
+    hijriLabel(input);
+    input.addEventListener('change', () => hijriLabel(input));
+});
 media.addEventListener('change', () => applyTheme(savedTheme() || root.dataset.defaultTheme));
 document.querySelectorAll('button[data-theme-choice]').forEach(button => button.addEventListener('click', () => {
     try { localStorage.setItem('theme', button.dataset.themeChoice); } catch { /* Still apply the choice for this page. */ }

@@ -33,6 +33,15 @@ class Roles
         ];
     }
 
+    /** Display name for any role, including the starter kit's system roles. */
+    public static function label(string $name): string
+    {
+        $key = 'school.roles.'.$name;
+        $label = __($key);
+
+        return is_string($label) && $label !== $key ? $label : (string) __(ucfirst(str_replace('_', ' ', $name)));
+    }
+
     public static function all(): array
     {
         return array_merge(self::STAFF, ['guardian']);

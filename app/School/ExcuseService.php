@@ -5,6 +5,7 @@ namespace App\School;
 use App\Models\AttendanceRecord;
 use App\Models\Excuse;
 use App\Models\User;
+use App\Support\Dates;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
@@ -34,7 +35,7 @@ class ExcuseService
         });
         if (! $approve) {
             $student = $record->student;
-            $this->notifier->toStaff($record->school_id, 'excuse_submitted', ['student' => $student->name, 'date' => $record->date->toDateString()], route('school.excuses.index', ['status' => 'pending']));
+            $this->notifier->toStaff($record->school_id, 'excuse_submitted', ['student' => $student->name, 'date' => Dates::both($record->date)], route('school.excuses.index', ['status' => 'pending']));
         }
 
         return $excuse;
@@ -53,7 +54,7 @@ class ExcuseService
             }
         });
         if ($notify) {
-            $this->notifier->toGuardians($excuse->student, 'excuse_reviewed', ['date' => $excuse->date->toDateString(), 'status' => __('school.excuse_status.'.$status)], route('school.guardian.index'));
+            $this->notifier->toGuardians($excuse->student, 'excuse_reviewed', ['date' => Dates::both($excuse->date), 'status' => __('school.excuse_status.'.$status)], route('school.guardian.index'));
         }
     }
 }

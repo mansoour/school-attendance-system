@@ -11,6 +11,7 @@ use App\Settings\SecretStore;
 use App\Settings\SettingsService;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // @date($value), @dateLong($value) and @dateTime($value): Hijri with Gregorian alongside.
+        Blade::directive('date', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e); ?>");
+        Blade::directive('dateLong', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e, true); ?>");
+        Blade::directive('dateTime', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e, false, true); ?>");
         $this->app->booted(function () {
             if (app()->runningInConsole() && array_intersect($_SERVER['argv'] ?? [], ['config:cache', 'optimize', 'package:discover'])) {
                 return;

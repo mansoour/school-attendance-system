@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Settings\SettingsService;
+use App\Support\Dates;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -63,7 +64,7 @@ class AttendanceService
 
     private function announce(Student $student, AttendanceRecord $record, Classroom $classroom): void
     {
-        $date = $record->date->toDateString();
+        $date = Dates::both($record->date);
         $url = route('school.guardian.index');
         if ($record->status === 'late') {
             $this->notifier->toGuardians($student, 'student_late', ['date' => $date], $url);
@@ -71,7 +72,7 @@ class AttendanceService
             return;
         }
         $this->notifier->toGuardians($student, 'student_absent', ['date' => $date], route('school.guardian.excuse', $record));
-        $this->notifier->toStaff($student->school_id, 'student_absent_staff', ['student' => $student->name, 'classroom' => $classroom->label(), 'date' => $date], route('school.attendance.index', ['date' => $date]));
+        $this->notifier->toStaff($student->school_id, 'student_absent_staff', ['student' => $student->name, 'classroom' => $classroom->label(), 'date' => $date], route('school.attendance.index', ['date' => $record->date->toDateString()]));
 
         $threshold = (int) $this->settings->get('school_notify.absence_threshold');
         $count = AttendanceRecord::where('student_id', $student->id)->where('status', 'absent')->where('date', '>=', $record->date->copy()->subDays(30))->count();

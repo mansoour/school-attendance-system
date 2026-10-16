@@ -6,6 +6,7 @@ use App\Models\AttendanceRecord;
 use App\Models\Classroom;
 use App\School\Stats;
 use App\Services\Audit\AuditLogger;
+use App\Support\Dates;
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -61,8 +62,8 @@ class ReportController extends Controller
             __('Summary') => [
                 [__('Item'), __('Value')],
                 [__('School'), $report['school']?->name ?? __('All schools')],
-                [__('From'), $report['from']->toDateString()],
-                [__('To'), $report['to']->toDateString()],
+                [__('From'), Dates::both($report['from'])],
+                [__('To'), Dates::both($report['to'])],
                 [__('Records'), $report['totals']['records']],
                 [__('school.status.present'), $report['totals']['present']],
                 [__('school.status.absent'), $report['totals']['absent']],
@@ -74,8 +75,8 @@ class ReportController extends Controller
                 $report['byClass']->map(fn ($r) => [$r['classroom']->grade?->name, $r['classroom']->name, $r['students'], $r['absent'], $r['excused'], $r['late'], $r['absence_rate'].'%'])->all()),
             __('Most absent') => array_merge([[__('Student'), __('National ID'), __('Class'), __('Absences'), __('Without excuse')]],
                 $report['topAbsent']->map(fn ($r) => [$r['student']->name, $r['student']->national_id, $r['student']->classroom?->label(), $r['total'], $r['unexcused']])->values()->all()),
-            __('Details') => array_merge([[__('Date'), __('Student'), __('National ID'), __('Class'), __('Status'), __('Late minutes'), __('Note')]],
-                $report['records']->map(fn ($r) => [$r->date->toDateString(), $r->student?->name, $r->student?->national_id, $r->classroom?->label(), __('school.status.'.$r->status), $r->late_minutes, $r->note])->all()),
+            __('Details') => array_merge([[__('Hijri date'), __('Gregorian date'), __('Student'), __('National ID'), __('Class'), __('Status'), __('Late minutes'), __('Note')]],
+                $report['records']->map(fn ($r) => [Dates::hijri($r->date), $r->date->toDateString(), $r->student?->name, $r->student?->national_id, $r->classroom?->label(), __('school.status.'.$r->status), $r->late_minutes, $r->note])->all()),
         ];
         $index = 0;
         foreach ($sheets as $title => $rows) {

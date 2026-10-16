@@ -1,5 +1,5 @@
 <x-admin-layout :title="__('Guardian communication')">
-<div class="page-head"><div><h1>{{ __('Guardian communication') }}</h1><p>{{ __('Contact the guardians of absent and late students by WhatsApp, phone or email. Each contact is logged.') }}</p></div>
+<div class="page-head"><img class="page-illustration" src="{{ asset('images/sized/guardian-communication.webp') }}" alt="" aria-hidden="true" width="560" height="336"><div><h1>{{ __('Guardian communication') }}</h1><p>{{ __('Contact the guardians of absent and late students by WhatsApp, phone or email. Each contact is logged.') }}</p></div>
 <div class="page-actions"><span class="pill tone-absent">{{ $records->where('status','absent')->count() }} {{ __('school.status.absent') }}</span><span class="pill tone-late">{{ $records->where('status','late')->count() }} {{ __('school.status.late') }}</span></div></div>
 <form method="get" class="toolbar">
 <label>{{ __('Date') }}<input type="date" name="date" value="{{ $date->toDateString() }}" max="{{ today()->toDateString() }}"></label>

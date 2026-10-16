@@ -7,14 +7,20 @@ $assets=app(\App\Support\BrandingStorage::class);
 $languages=\App\Models\Locale::where('is_active',true)->get();
 $direction=\App\Models\Locale::find($locale)?->direction ?? 'ltr';
 @endphp
-<!DOCTYPE html><html lang="{{ $locale }}" dir="{{ $direction }}" data-default-theme="{{ $settings->get('appearance.theme') }}" data-dark-enabled="{{ $settings->get('appearance.dark_enabled') ? '1':'0' }}">
+<!DOCTYPE html>
+<!-- {{ \App\Support\Credits::line() }} -->
+<html lang="{{ $locale }}" dir="{{ $direction }}" data-default-theme="{{ $settings->get('appearance.theme') }}" data-dark-enabled="{{ $settings->get('appearance.dark_enabled') ? '1':'0' }}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>{{ $title ? $title.' | ' : '' }}{{ $brand }}</title>
 <script>
 (() => { const root=document.documentElement; let choice=root.dataset.defaultTheme; try { choice=localStorage.getItem('theme') || choice; } catch {} const dark=root.dataset.darkEnabled==='1' && (choice==='dark' || (choice==='system' && matchMedia('(prefers-color-scheme: dark)').matches)); root.dataset.theme=dark?'dark':'light'; root.classList.toggle('dark',dark); root.style.colorScheme=dark?'dark':'light'; })();
 </script>
 <link rel="stylesheet" href="{{ asset('fonts/fonts.css') }}">
-@if($settings->get('branding.favicon'))<link rel="icon" href="{{ $assets->url($settings->get('branding.favicon')) }}">@endif
-@if($settings->get('branding.touch_icon'))<link rel="apple-touch-icon" href="{{ $assets->url($settings->get('branding.touch_icon')) }}">@endif
+<link rel="icon" type="image/png" href="{{ $settings->get('branding.favicon') ? $assets->url($settings->get('branding.favicon')) : asset('images/sized/brand-64.png') }}">
+<link rel="apple-touch-icon" href="{{ $settings->get('branding.touch_icon') ? $assets->url($settings->get('branding.touch_icon')) : asset('images/sized/brand-180.png') }}">
+<meta name="author" content="{{ \App\Support\Credits::DEVELOPER }} — {{ \App\Support\Credits::GITHUB }} · {{ \App\Support\Credits::WEBSITE }}">
+<meta name="description" content="{{ $settings->get('homepage.description.'.$locale) ?: $settings->get('homepage.description.en') }}">
+<meta property="og:title" content="{{ $title ? $title.' | ' : '' }}{{ $brand }}"><meta property="og:description" content="{{ $settings->get('homepage.description.'.$locale) ?: $settings->get('homepage.description.en') }}">
+<meta property="og:image" content="{{ asset('images/sized/social-share.png') }}"><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#6d5df5">
 <style>
 @foreach(['light','dark'] as $theme)
 {{ $theme==='light'?':root':'html[data-theme=dark]' }} {
@@ -29,7 +35,7 @@ $direction=\App\Models\Locale::find($locale)?->direction ?? 'ltr';
 <body class="{{ $admin ? 'admin-body' : '' }}" x-data="{sidebarOpen:false}">
 <header class="site-header {{ $admin?'admin-header':'' }}">
 @if($admin)<button type="button" class="icon-button mobile-menu" @click="sidebarOpen=!sidebarOpen" :aria-expanded="sidebarOpen" aria-controls="admin-sidebar" aria-label="{{ __('Toggle navigation') }}"><x-ui-icon name="menu"/></button>@endif
-<a class="brand" href="{{ route('home') }}">@if($logo)<img src="{{ $assets->url($logo) }}" alt="{{ $brand }}" class="brand-logo">@else<span class="brand-mark"><x-ui-icon name="heart-handshake"/></span><span>{{ $brand }}</span>@endif</a>
+<a class="brand" href="{{ route('home') }}">@if($logo)<img src="{{ $assets->url($logo) }}" alt="{{ $brand }}" class="brand-logo">@else<img src="{{ asset('images/sized/brand-128.webp') }}" alt="" class="brand-img" width="40" height="40"><span>{{ $brand }}</span>@endif</a>
 @if(!$admin)<nav aria-label="{{ __('Main navigation') }}"><a href="{{ route('home') }}">{{ __('Home') }}</a><a href="{{ route('pages.show','about') }}">{{ __('About') }}</a><a href="{{ route('contact') }}">{{ __('Contact') }}</a></nav>@else<span class="admin-heading">{{ $heading ?? __('Administration') }}</span>@endif
 <div class="header-actions">
 @auth<x-navbar-notifications/>@endauth

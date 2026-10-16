@@ -11,6 +11,7 @@ $greeting=$hour<12 ? __('Good morning') : __('Good evening');
 <h1>{{ $greeting }}، {{ \Illuminate\Support\Str::of(auth()->user()->name)->explode(' ')->first() }}</h1>
 <p>@dateLong($date)</p>
 </div>
+<img class="hero-decoration" src="{{ asset('images/sized/dashboard-decoration.webp') }}" alt="" aria-hidden="true" width="480" height="360">
 <form method="get" class="hero-panel-actions">
 <label class="field">{{ __('Date') }}<input type="date" name="date" value="{{ $date->toDateString() }}" max="{{ today()->toDateString() }}" onchange="this.form.submit()"></label>
 @can('attendance.take')<a class="button light" href="{{ route('school.attendance.classes',['date'=>$date->toDateString()]) }}"><x-ui-icon name="clipboard-check"/>{{ __('Take attendance') }}</a>@endcan
@@ -29,7 +30,7 @@ $greeting=$hour<12 ? __('Good morning') : __('Good evening');
 @if($mode==='leadership')
 <div class="role-cards">
 @foreach(['principal','vice_principal','student_affairs','health_guide','counselor','guardian'] as $card)
-<div class="role-card"><span class="role-icon"><x-ui-icon :name="$roleIcons[$card]"/></span><strong>{{ __('school.roles.'.$card) }}</strong><small>{{ __('school.role_descriptions.'.$card) }}</small><span class="count">{{ $roleCounts[$card] ?? 0 }}</span></div>
+<div class="role-card"><img class="role-img" src="{{ asset('images/sized/'.$card.'.webp') }}" alt="" width="80" height="80" loading="lazy"><strong>{{ __('school.roles.'.$card) }}</strong><small>{{ __('school.role_descriptions.'.$card) }}</small><span class="count">{{ $roleCounts[$card] ?? 0 }}</span></div>
 @endforeach
 </div>
 @php
@@ -59,7 +60,7 @@ foreach($byGrade->values() as $i=>$value){ $end=$start+$value*100/$gradeTotal; $
 @if($mode==='affairs')
 <div class="grid-3">
 <section class="card"><div class="card-head"><h2><x-ui-icon name="clipboard-check"/>{{ __('Classes waiting for attendance') }}</h2><a class="small" href="{{ route('school.attendance.classes',['date'=>$date->toDateString()]) }}">{{ __('All classes') }}</a></div>
-@if($notTaken->isEmpty())<div class="banner"><x-ui-icon name="circle-check"/><p>{{ __('Attendance has been recorded for every class today. Well done!') }}</p></div>
+@if($notTaken->isEmpty())<div class="illustrated-state"><img src="{{ asset('images/sized/all-classes-recorded.webp') }}" alt="" width="200" height="200"><p>{{ __('Attendance has been recorded for every class today. Well done!') }}</p></div>
 @else<div class="stat-grid">@foreach($notTaken as $row)<a class="stat tone-late" href="{{ route('school.attendance.take',[$row['classroom'],'date'=>$date->toDateString()]) }}"><span class="stat-icon"><x-ui-icon name="clipboard-check"/></span><div><strong style="font-size:1rem">{{ $row['classroom']->label() }}</strong><span>{{ $row['students'] }} {{ __('students') }}</span></div></a>@endforeach</div>@endif
 </section>
 <div class="stack-sm">

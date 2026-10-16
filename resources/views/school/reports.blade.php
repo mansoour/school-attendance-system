@@ -1,7 +1,7 @@
 <x-admin-layout :title="__('Reports and statistics')">
 @php($query=request()->only(['from','to','grade','classroom']))
 @php($maxDaily=max(1,$daily->max('absent') ?? 1))
-<div class="page-head"><div><h1>{{ __('Reports and statistics') }}</h1><p>{{ \App\Support\Dates::both($from) }} — {{ \App\Support\Dates::both($to) }}</p></div>
+<div class="page-head"><img class="page-illustration" src="{{ asset('images/sized/reports.webp') }}" alt="" aria-hidden="true" width="560" height="336"><div><h1>{{ __('Reports and statistics') }}</h1><p>{{ \App\Support\Dates::both($from) }} — {{ \App\Support\Dates::both($to) }}</p></div>
 @can('reports.export')<div class="page-actions"><a class="button secondary" href="{{ route('school.reports.export',['format'=>'xlsx']+$query) }}"><x-ui-icon name="file-spreadsheet"/>{{ __('Export Excel') }}</a><a class="button secondary" href="{{ route('school.reports.export',['format'=>'pdf']+$query) }}"><x-ui-icon name="file-down"/>{{ __('Export PDF') }}</a><button type="button" class="secondary" onclick="window.print()"><x-ui-icon name="printer"/>{{ __('Print') }}</button></div>@endcan</div>
 <form method="get" class="toolbar">
 <label>{{ __('From') }}<input type="date" name="from" value="{{ $from->toDateString() }}"></label>

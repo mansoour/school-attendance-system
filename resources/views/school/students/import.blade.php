@@ -1,5 +1,5 @@
 <x-admin-layout :title="__('Import students')">
-<div class="page-head"><div><h1>{{ __('Import students from Excel') }}</h1><p>{{ __('Students are matched by national ID: existing students are updated and new ones are added.') }}</p></div>
+<div class="page-head"><img class="page-illustration" src="{{ asset('images/sized/import-students.webp') }}" alt="" aria-hidden="true" width="480" height="360"><div><h1>{{ __('Import students from Excel') }}</h1><p>{{ __('Students are matched by national ID: existing students are updated and new ones are added.') }}</p></div>
 <div class="page-actions"><a class="button secondary" href="{{ route('school.students.template') }}"><x-ui-icon name="download"/>{{ __('Download template') }}</a></div></div>
 @if(session('import_errors'))<div class="errors" role="alert"><strong>{{ __('Rows that need attention') }}</strong><ul>@foreach(session('import_errors') as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="grid-2">

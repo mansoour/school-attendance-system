@@ -6,6 +6,7 @@ use App\Models\AttendanceRecord;
 use App\Models\Classroom;
 use App\School\Stats;
 use App\Services\Audit\AuditLogger;
+use App\Support\Credits;
 use App\Support\Dates;
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
@@ -107,6 +108,8 @@ class ReportController extends Controller
         $mpdf = new Mpdf(['mode' => 'utf-8', 'format' => 'A4', 'tempDir' => $directory, 'default_font' => 'dejavusans', 'autoScriptToLang' => true, 'autoLangToFont' => true, 'margin_top' => 12, 'margin_bottom' => 12]);
         $mpdf->SetDirectionality($rtl ? 'rtl' : 'ltr');
         $mpdf->SetTitle(__('Attendance report'));
+        $mpdf->SetCreator(Credits::line());
+        $mpdf->SetAuthor(Credits::DEVELOPER);
         $mpdf->WriteHTML(view('school.reports-pdf', $report + ['rtl' => $rtl])->render());
 
         return response($mpdf->Output($name.'.pdf', 'S'), 200, ['Content-Type' => 'application/pdf', 'Content-Disposition' => 'attachment; filename="'.$name.'.pdf"']);

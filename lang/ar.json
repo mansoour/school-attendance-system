@@ -1138,5 +1138,15 @@
   "Guardian_link_approved": "اعتماد ربط ولي الأمر",
   "Repeated_absence": "تكرار الغياب",
   "Friday and Saturday are the weekend. Showing the last school day.": "الجمعة والسبت عطلة نهاية الأسبوع، ويُعرض آخر يوم دراسي.",
-  "Attendance can only be recorded on school days (Sunday to Thursday).": "يُسجل الحضور في أيام الدراسة فقط (من الأحد إلى الخميس)."
+  "Attendance can only be recorded on school days (Sunday to Thursday).": "يُسجل الحضور في أيام الدراسة فقط (من الأحد إلى الخميس).",
+  "Students walking into school, connected with their families through Tawasul": "طالبات يدخلن المدرسة ومتصلات بأسرهن عبر منصة تواصل",
+  "One platform for the whole school": "منصة واحدة للمدرسة بأكملها",
+  "For guardians": "لأولياء الأمور",
+  "Know right away, act right away": "اعرف فورًا وتصرّف فورًا",
+  "Guardians are notified as soon as an absence or late arrival is recorded, can send the excuse with a medical report in seconds, and follow the school’s notes about their children.": "يصل الإشعار لولي الأمر فور تسجيل الغياب أو التأخر، ويستطيع إرسال العذر مع التقرير الطبي في ثوانٍ، ومتابعة ملاحظات المدرسة عن أبنائه.",
+  "For school staff": "لمنسوبات المدرسة",
+  "Clear numbers for better decisions": "أرقام واضحة لقرارات أفضل",
+  "Daily attendance per class, repeated-absence alerts, counseling and health notes, and reports by grade and class exportable to Excel and PDF.": "تحضير يومي لكل فصل، وتنبيهات تكرار الغياب، وملاحظات صحية وإرشادية، وتقارير حسب الصف والفصل مع التصدير إلى Excel وPDF.",
+  "A welcoming school entrance with a heart above the door": "مدخل مدرسة مرحِّب يعلوه قلب",
+  "A dedicated dashboard for every role": "لوحة مخصصة لكل دور"
 }

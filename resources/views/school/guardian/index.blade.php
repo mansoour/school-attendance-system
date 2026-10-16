@@ -1,5 +1,5 @@
 <x-admin-layout :title="__('My children')">
-<div class="page-head"><div><h1>{{ __('My children') }}</h1><p>{{ __('Follow your children’s attendance, send excuses and read the school’s notes.') }}</p></div></div>
+<div class="page-head"><img class="page-illustration" src="{{ asset('images/sized/guardian.webp') }}" alt="" aria-hidden="true" width="192" height="192"><div><h1>{{ __('My children') }}</h1><p>{{ __('Follow your children’s attendance, send excuses and read the school’s notes.') }}</p></div></div>
 @if($children->isEmpty())<div class="banner"><x-ui-icon name="user-plus"/><p>{{ __('No student is linked to your account yet. Add your child below.') }}</p></div>@endif
 <div class="stat-grid">
 @foreach($children as $child)

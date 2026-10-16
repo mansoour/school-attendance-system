@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\EmailTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -9,7 +10,8 @@ use Illuminate\Notifications\Notification;
 
 /**
  * A school event delivered in-app and/or by email, as configured under
- * Administration → School notifications. Text is rendered in the recipient's language.
+ * System settings → School notifications. Email text comes from the event's
+ * email template when one is active, otherwise from the translation files.
  */
 class SchoolNotification extends Notification implements ShouldQueue
 {
@@ -36,10 +38,23 @@ class SchoolNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $message = __('notifications.'.$this->event, $this->parameters, $notifiable->preferredLocale());
+        $locale = $notifiable->preferredLocale();
+        $template = EmailTemplate::where('event', $this->event)->first();
+        $tokens = collect($this->parameters + ['name' => $notifiable->name])->mapWithKeys(fn ($value, $key) => ['{'.$key.'}' => $value])->all();
+        $subject = $template?->localized('subject', $locale) ?: __('notifications.subject.'.$this->event, [], $locale);
+        $body = $template?->localized('body', $locale) ?: __('notifications.'.$this->event, $this->parameters, $locale);
+        $message = (new MailMessage)->subject(strtr($subject, $tokens))->greeting(__('Hello :name', ['name' => $notifiable->name], $locale));
+        foreach (preg_split('/\R/', strtr($body, $tokens)) as $line) {
+            if (trim($line) !== '') {
+                $message->line($line);
+            }
+        }
 
-        return (new MailMessage)->subject(__('notifications.subject.'.$this->event, [], $notifiable->preferredLocale()))
-            ->greeting(__('Hello :name', ['name' => $notifiable->name], $notifiable->preferredLocale()))
-            ->line($message)->action(__('Open', [], $notifiable->preferredLocale()), $this->url);
+        return $message->action(__('Open', [], $locale), $this->url);
+    }
+
+    public function shouldSend(object $notifiable, string $channel): bool
+    {
+        return $channel !== 'mail' || (EmailTemplate::where('event', $this->event)->value('is_active') ?? true);
     }
 }

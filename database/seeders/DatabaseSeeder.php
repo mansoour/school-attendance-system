@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Page;
 use App\School\Roles;
+use App\Support\DefaultContent;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -30,9 +31,8 @@ class DatabaseSeeder extends Seeder
             }
         }
         Page::firstOrCreate(['slug' => 'about'], self::aboutPage());
-        foreach (['help' => ['Help', 'المساعدة'], 'privacy' => ['Privacy', 'الخصوصية'], 'cookies' => ['Cookie policy', 'سياسة ملفات الارتباط'], 'terms' => ['Terms', 'الشروط']] as $slug => $titles) {
-            Page::firstOrCreate(['slug' => $slug], ['title' => ['en' => $titles[0], 'ar' => $titles[1]], 'body' => ['en' => 'Replace this page with your school’s information before launch.', 'ar' => 'استبدل محتوى هذه الصفحة بمعلومات المدرسة قبل الإطلاق.'], 'is_published' => true]);
-        }
+        Page::firstOrCreate(['slug' => 'cookies'], ['title' => ['en' => 'Cookie policy', 'ar' => 'سياسة ملفات الارتباط'], 'body' => ['en' => 'Tawasul uses only essential cookies to keep you signed in, protect forms and remember your language and theme.', 'ar' => 'تستخدم منصة تواصل ملفات الارتباط الضرورية فقط لإبقائك مسجلًا للدخول وحماية النماذج وحفظ اللغة والمظهر.'], 'is_published' => true]);
+        DefaultContent::install();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

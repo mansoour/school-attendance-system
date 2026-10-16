@@ -44,7 +44,7 @@ class MemberNotification extends Notification implements ShouldQueue
         $body = $template?->localized('body') ?: __('notifications.'.$this->event);
 
         return (new MailMessage)->subject($subject)->greeting(__('Hello :name', ['name' => $notifiable->name]))
-            ->line(str_replace('{name}', $notifiable->name, $body))->action(__('Open account'), url('/app'));
+            ->line(str_replace('{name}', $notifiable->name, $body))->action(__('Open account'), url('/dashboard'));
     }
 
     public function shouldSend(object $notifiable, string $channel): bool

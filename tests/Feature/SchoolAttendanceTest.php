@@ -80,6 +80,35 @@ class SchoolAttendanceTest extends TestCase
         $this->assertSame([], DB::table('missing_translations')->where('locale', 'ar')->pluck('key')->all());
     }
 
+    public function test_owner_viewing_all_schools_picks_a_school_for_settings_and_has_no_children_menu(): void
+    {
+        $owner = User::factory()->create();
+        $owner->assignRole('owner');
+        $this->actingAs($owner)->withSession(['locale' => 'ar'])->get(route('school.settings'))->assertOk()
+            ->assertSee('Sample School')->assertDontSee(route('school.guardian.index'), false);
+        $this->post(route('school.switch'), ['school_id' => $this->school->id]);
+        $this->get(route('school.settings'))->assertOk()->assertSee('name="day_starts_at"', false);
+
+        $guardian = $this->guardian();
+        $this->actingAs($guardian)->get(route('school.guardian.index'))->assertOk()->assertSee(route('school.guardian.index'), false);
+    }
+
+    public function test_activity_log_shows_translated_actions_with_a_selectable_filter(): void
+    {
+        $principal = $this->staff('principal');
+        $this->actingAs($principal)->post(route('school.grades.store'), ['name' => 'Fifth primary', 'stage' => 'primary']);
+        $this->withSession(['locale' => 'ar'])->get(route('school.activity'))->assertOk()
+            ->assertSee('إضافة: صف')->assertSee('<option value="grade.created"', false);
+        $this->get(route('school.activity', ['action' => 'grade.created']))->assertOk()->assertSee('إضافة: صف');
+    }
+
+    public function test_default_content_and_email_templates_are_installed(): void
+    {
+        $this->get('/pages/privacy')->assertOk()->assertSee('سياسة الخصوصية');
+        $this->assertDatabaseHas('email_templates', ['event' => 'student_absent', 'is_active' => true]);
+        $this->assertDatabaseCount('site_notices', 1);
+    }
+
     public function test_taking_attendance_notifies_guardians_and_is_audited(): void
     {
         Notification::fake();

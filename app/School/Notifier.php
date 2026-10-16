@@ -25,7 +25,7 @@ class Notifier
         'excuse_submitted' => ['health_guide', 'student_affairs', 'vice_principal'],
         'guardian_registered' => ['student_affairs', 'principal'],
         'repeated_absence' => ['counselor', 'principal', 'vice_principal'],
-        'student_absent_staff' => [],
+        'student_absent_staff' => ['vice_principal'],
     ];
 
     public function __construct(private SettingsService $settings) {}

@@ -89,9 +89,9 @@ class SettingsRegistry
         ]];
         foreach (Notifier::events() as $event) {
             $title = ucfirst(str_replace('_', ' ', $event));
-            $sections['school-notifications']['fields']["school_notify.$event.enabled"] = $bool("$title: enabled", $event !== 'student_absent_staff');
+            $sections['school-notifications']['fields']["school_notify.$event.enabled"] = $bool("$title: enabled", true);
             $sections['school-notifications']['fields']["school_notify.$event.database"] = $bool("$title: in-app", true);
-            $sections['school-notifications']['fields']["school_notify.$event.mail"] = $bool("$title: email", in_array($event, ['student_absent', 'excuse_reviewed', 'guardian_link_approved'], true));
+            $sections['school-notifications']['fields']["school_notify.$event.mail"] = $bool("$title: email", true);
             if (in_array($event, Notifier::STAFF_EVENTS, true)) {
                 $sections['school-notifications']['fields']["school_notify.$event.roles"] = ['label' => "$title: recipient roles", 'type' => 'roles', 'default' => Notifier::DEFAULT_ROLES[$event], 'rules' => 'nullable|array', 'help' => ''];
             }

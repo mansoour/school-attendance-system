@@ -1,7 +1,7 @@
 @php
 $schoolName=$student->school?->name ?? '';
 $status=$status ?? 'absent';
-$message=__('guardian_message.'.$status,['student'=>$student->name,'date'=>$date->toDateString(),'school'=>$schoolName]);
+$message=__('guardian_message.'.$status,['student'=>$student->name,'date'=>\App\Support\Dates::both($date),'school'=>$schoolName]);
 $wa=\App\Models\Student::whatsappNumber($student->guardian_phone);
 $canLog=auth()->user()->can('communication.access');
 @endphp

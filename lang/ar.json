@@ -1107,5 +1107,21 @@
   "schools.manage": "إدارة المدارس",
   "students.import": "استيراد الطالبات",
   "students.manage": "إدارة الطالبات",
-  "students.view": "عرض الطالبات"
+  "students.view": "عرض الطالبات",
+  "Good morning": "صباح الخير",
+  "Good evening": "مساء الخير",
+  "Home": "الرئيسية",
+  "Attendance": "الحضور والغياب",
+  "Follow-up and communication": "المتابعة والتواصل",
+  "Reports": "التقارير",
+  "My account": "حسابي",
+  "All accounts: staff and guardians.": "جميع الحسابات: المنسوبات وأولياء الأمور.",
+  "Classes waiting for attendance": "فصول بانتظار التحضير",
+  "Attendance has been recorded for every class today. Well done!": "تم تحضير جميع الفصول اليوم. أحسنتِ!",
+  "No excuses awaiting review.": "لا توجد أعذار بانتظار المراجعة.",
+  "Latest health notes": "أحدث الملاحظات الصحية",
+  "Students needing follow-up": "طالبات بحاجة للمتابعة",
+  "Latest counseling notes": "أحدث الملاحظات الإرشادية",
+  "Hijri date": "التاريخ الهجري",
+  "Gregorian date": "التاريخ الميلادي"
 }

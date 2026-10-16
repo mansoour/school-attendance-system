@@ -1,6 +1,6 @@
 <x-admin-layout :title="__('Class attendance')">
 @php($canTake=auth()->user()->can('attendance.take'))
-<div class="page-head"><div><h1>{{ $classroom->label() }}</h1><p>{{ __('Attendance for') }} {{ $date->locale(app()->getLocale())->translatedFormat('l j F Y') }}</p></div>
+<div class="page-head"><div><h1>{{ $classroom->label() }}</h1><p>{{ __('Attendance for') }} @dateLong($date)</p></div>
 <form method="get" class="page-actions" x-data>
 <select aria-label="{{ __('Class') }}" @change="window.location=$event.target.value">@foreach($classes as $option)<option value="{{ route('school.attendance.take',[$option,'date'=>$date->toDateString()]) }}" @selected($option->id===$classroom->id)>{{ $option->label() }}</option>@endforeach</select>
 <input type="date" name="date" value="{{ $date->toDateString() }}" max="{{ today()->toDateString() }}" aria-label="{{ __('Date') }}" onchange="this.form.submit()">

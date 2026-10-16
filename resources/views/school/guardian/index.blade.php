@@ -18,13 +18,13 @@
 <div class="table-wrap"><table><thead><tr><th>{{ __('Date') }}</th><th>{{ __('Student') }}</th><th>{{ __('Status') }}</th><th>{{ __('Excuse') }}</th></tr></thead><tbody>
 @forelse($records as $record)
 @php($excuse=$record->excuses->last())
-<tr><td>{{ $record->date->toDateString() }}</td><td>{{ $record->student?->name }}</td><td><span class="pill tone-{{ $record->status }}">{{ __('school.status.'.$record->status) }}</span></td>
+<tr><td>@date($record->date)</td><td>{{ $record->student?->name }}</td><td><span class="pill tone-{{ $record->status }}">{{ __('school.status.'.$record->status) }}</span></td>
 <td>@if($excuse)<span class="pill tone-{{ $excuse->status }}">{{ __('school.excuse_status.'.$excuse->status) }}</span>@if($excuse->review_note)<br><small>{{ $excuse->review_note }}</small>@endif @if($excuse->status==='rejected')<br><a class="small" href="{{ route('school.guardian.excuse',$record) }}">{{ __('Send another excuse') }}</a>@endif
 @elseif(in_array($record->status,['absent','late']))<a class="button tiny" href="{{ route('school.guardian.excuse',$record) }}"><x-ui-icon name="file-text"/>{{ __('Send excuse') }}</a>@else<span class="muted">—</span>@endif</td></tr>
 @empty<tr><td colspan="4" class="empty"><x-ui-icon name="circle-check"/><br>{{ __('No absences or late arrivals recorded.') }}</td></tr>@endforelse
 </tbody></table></div></section>
 <section class="card"><h2><x-ui-icon name="notebook-pen"/>{{ __('Notes from the school') }}</h2>
-<ul class="list">@forelse($notes as $note)<li><span class="list-icon"><x-ui-icon name="notebook-pen"/></span><div><strong class="small">{{ $note->student?->name }}</strong> <span class="pill">{{ __('school.note_category.'.$note->category) }}</span><p style="margin:6px 0;color:var(--ink)">{{ $note->body }}</p><small>{{ $note->created_at->format('Y-m-d') }}</small></div></li>@empty<li class="small muted">{{ __('No notes yet.') }}</li>@endforelse</ul></section>
+<ul class="list">@forelse($notes as $note)<li><span class="list-icon"><x-ui-icon name="notebook-pen"/></span><div><strong class="small">{{ $note->student?->name }}</strong> <span class="pill">{{ __('school.note_category.'.$note->category) }}</span><p style="margin:6px 0;color:var(--ink)">{{ $note->body }}</p><small>{{ \App\Support\Dates::both($note->created_at) }}</small></div></li>@empty<li class="small muted">{{ __('No notes yet.') }}</li>@endforelse</ul></section>
 </div>
 <form method="post" action="{{ route('school.guardian.link') }}" class="card stack-sm">@csrf<h2><x-ui-icon name="user-plus"/>{{ __('Add a child') }}</h2>
 <label class="field">{{ __('Student national ID') }}<input name="student_national_id" required dir="ltr" inputmode="numeric" value="{{ old('student_national_id') }}"></label>

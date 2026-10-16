@@ -9,7 +9,7 @@
 <ul class="list">@forelse($notes as $note)
 <li><span class="list-icon"><x-ui-icon :name="match($note->category){'health'=>'heart-pulse','counseling'=>'user-round','behavior'=>'shield-alert','attendance'=>'calendar-check',default=>'notebook-pen'}"/></span>
 <div style="flex:1"><a href="{{ route('school.students.show',$note->student) }}"><strong class="small">{{ $note->student?->name }}</strong></a> <span class="muted small">{{ $note->student?->classroom?->label() }}</span><br><span class="pill">{{ __('school.note_category.'.$note->category) }}</span>@if($note->visible_to_guardian) <span class="pill tone-violet">{{ __('Shared with guardian') }}</span>@endif
-<p style="margin:6px 0;color:var(--ink)">{{ $note->body }}</p><small>{{ $note->author?->name }} · {{ $note->created_at->format('Y-m-d H:i') }}</small></div>
+<p style="margin:6px 0;color:var(--ink)">{{ $note->body }}</p><small>{{ $note->author?->name }} · {{ \App\Support\Dates::both($note->created_at) }}</small></div>
 @if(auth()->id()===$note->author_id || auth()->user()->can('employees.manage'))@can('notes.manage')<form method="post" action="{{ route('school.notes.destroy',$note) }}" onsubmit="return confirm('{{ __('Delete this note?') }}')">@csrf @method('DELETE')<button class="tiny secondary" aria-label="{{ __('Delete') }}"><x-ui-icon name="trash-2"/></button></form>@endcan @endif</li>
 @empty<li class="empty">{{ __('No notes yet.') }}</li>@endforelse</ul>
 {{ $notes->links() }}</section>

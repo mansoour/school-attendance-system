@@ -1,7 +1,7 @@
 <x-admin-layout :title="__('Reports and statistics')">
 @php($query=request()->only(['from','to','grade','classroom']))
 @php($maxDaily=max(1,$daily->max('absent') ?? 1))
-<div class="page-head"><div><h1>{{ __('Reports and statistics') }}</h1><p>{{ $from->toDateString() }} — {{ $to->toDateString() }}</p></div>
+<div class="page-head"><div><h1>{{ __('Reports and statistics') }}</h1><p>{{ \App\Support\Dates::both($from) }} — {{ \App\Support\Dates::both($to) }}</p></div>
 @can('reports.export')<div class="page-actions"><a class="button secondary" href="{{ route('school.reports.export',['format'=>'xlsx']+$query) }}"><x-ui-icon name="file-spreadsheet"/>{{ __('Export Excel') }}</a><a class="button secondary" href="{{ route('school.reports.export',['format'=>'pdf']+$query) }}"><x-ui-icon name="file-down"/>{{ __('Export PDF') }}</a><button type="button" class="secondary" onclick="window.print()"><x-ui-icon name="printer"/>{{ __('Print') }}</button></div>@endcan</div>
 <form method="get" class="toolbar">
 <label>{{ __('From') }}<input type="date" name="from" value="{{ $from->toDateString() }}"></label>
@@ -20,7 +20,7 @@
 <div class="grid-2">
 <section class="card"><h2><x-ui-icon name="chart-column"/>{{ __('Daily absences') }}</h2>
 @if($daily->isEmpty())<p class="empty">{{ __('No data for this period.') }}</p>@else
-<div class="bars" role="img" aria-label="{{ __('Daily absences') }}">@foreach($daily as $day)<div title="{{ $day->date instanceof \DateTimeInterface ? $day->date->format('Y-m-d') : $day->date }}: {{ $day->absent }}"><span style="height:{{ round($day->absent*100/$maxDaily) }}%"></span></div>@endforeach</div>@endif</section>
+<div class="bars" role="img" aria-label="{{ __('Daily absences') }}">@foreach($daily as $day)<div title="{{ \App\Support\Dates::both($day->date) }}: {{ $day->absent }}"><span style="height:{{ round($day->absent*100/$maxDaily) }}%"></span></div>@endforeach</div>@endif</section>
 <section class="card"><h2><x-ui-icon name="triangle-alert"/>{{ __('Most absent students') }}</h2>
 <div class="table-wrap"><table><thead><tr><th>{{ __('Student') }}</th><th>{{ __('Class') }}</th><th class="num">{{ __('Absences') }}</th><th class="num">{{ __('Without excuse') }}</th></tr></thead><tbody>
 @forelse($topAbsent as $row)<tr><td><a href="{{ route('school.students.show',$row['student']) }}">{{ $row['student']->name }}</a></td><td class="small">{{ $row['student']->classroom?->label() }}</td><td class="num">{{ $row['total'] }}</td><td class="num">{{ $row['unexcused'] }}</td></tr>

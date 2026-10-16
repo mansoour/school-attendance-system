@@ -51,7 +51,7 @@ class NavbarTest extends TestCase
     {
         $this->get('/')->assertOk()->assertSee('html[data-theme=dark] {', false)
             ->assertDontSee('html[data-theme=&quot;dark&quot;]', false)
-            ->assertSee('--surface:#102219', false)->assertSee('--surface:#FFFFFF', false)
+            ->assertSee('--surface:#13111F', false)->assertSee('--surface:#FFFFFF', false)
             ->assertSee('data-theme-choice="dark"', false);
     }
 
@@ -62,12 +62,12 @@ class NavbarTest extends TestCase
         foreach ([$user, $user, $other] as $recipient) {
             $recipient->notifications()->create(['id' => (string) Str::uuid(), 'type' => 'test', 'data' => ['event' => 'welcome']]);
         }
-        $this->actingAs($user)->get('/app')->assertOk()->assertSee('navbarNotifications(2)', false)
+        $this->actingAs($user)->get('/account')->assertOk()->assertSee('navbarNotifications(2)', false)
             ->assertSee('id="navbar-notifications"', false)->assertSee('View all notifications');
         $this->getJson('/api/v1/notifications')->assertJsonPath('unread_count', 2);
         $this->postJson('/api/v1/notifications/read-all')->assertNoContent();
         $this->getJson('/api/v1/notifications')->assertJsonPath('unread_count', 0);
         $this->assertSame(1, $other->unreadNotifications()->count());
-        $this->get('/app')->assertOk()->assertSee('navbarNotifications(0)', false);
+        $this->get('/account')->assertOk()->assertSee('navbarNotifications(0)', false);
     }
 }

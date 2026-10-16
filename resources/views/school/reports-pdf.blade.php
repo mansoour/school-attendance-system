@@ -6,7 +6,7 @@ table{width:100%;border-collapse:collapse;margin-top:4px}th{background:#e6f2ee;f
 .num{text-align:center}.cards td{text-align:center;border:1px solid #cfdcd7;padding:8px}.cards strong{font-size:14pt;display:block}
 </style></head><body>
 <h1>{{ __('Attendance report') }}</h1>
-<p class="meta">{{ $school?->name ?? __('All schools') }} · {{ $from->toDateString() }} — {{ $to->toDateString() }} · {{ __('Generated at') }} {{ now()->format('Y-m-d H:i') }}</p>
+<p class="meta">{{ $school?->name ?? __('All schools') }} · {{ \App\Support\Dates::both($from) }} — {{ \App\Support\Dates::both($to) }} · {{ __('Generated at') }} {{ \App\Support\Dates::both(now()) }} {{ now()->format('H:i') }}</p>
 <table class="cards"><tr>
 <td><strong>{{ $totals['records'] }}</strong>{{ __('Attendance records') }}</td>
 <td><strong>{{ $totals['absent'] }}</strong>{{ __('Unexcused absences') }}</td>
@@ -24,6 +24,6 @@ table{width:100%;border-collapse:collapse;margin-top:4px}th{background:#e6f2ee;f
 </tbody></table>
 <h2>{{ __('Details') }}</h2>
 <table><thead><tr><th>{{ __('Date') }}</th><th>{{ __('Student') }}</th><th>{{ __('Class') }}</th><th>{{ __('Status') }}</th><th>{{ __('Note') }}</th></tr></thead><tbody>
-@forelse($records as $record)<tr><td>{{ $record->date->toDateString() }}</td><td>{{ $record->student?->name }}</td><td>{{ $record->classroom?->label() }}</td><td>{{ __('school.status.'.$record->status) }}@if($record->late_minutes) ({{ $record->late_minutes }} {{ __('min') }})@endif</td><td>{{ $record->note }}</td></tr>@empty<tr><td colspan="5">{{ __('No data for this period.') }}</td></tr>@endforelse
+@forelse($records as $record)<tr><td>{{ \App\Support\Dates::both($record->date) }}</td><td>{{ $record->student?->name }}</td><td>{{ $record->classroom?->label() }}</td><td>{{ __('school.status.'.$record->status) }}@if($record->late_minutes) ({{ $record->late_minutes }} {{ __('min') }})@endif</td><td>{{ $record->note }}</td></tr>@empty<tr><td colspan="5">{{ __('No data for this period.') }}</td></tr>@endforelse
 </tbody></table>
 </body></html>

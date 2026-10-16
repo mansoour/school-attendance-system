@@ -5,9 +5,11 @@ namespace App\Providers;
 use App\Localization\CatalogLoader;
 use App\Localization\CatalogTranslator;
 use App\Models\EmailLog;
+use App\School\GuardianLinker;
 use App\Settings\RuntimeSettings;
 use App\Settings\SecretStore;
 use App\Settings\SettingsService;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
@@ -68,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
 
             return $rule;
         });
+        Event::listen(Verified::class, fn ($event) => app(GuardianLinker::class)->activate($event->user));
         Event::listen(MessageSent::class, function ($event) {
             EmailLog::create(['provider_id' => $event->message->getHeaders()->get('X-Resend-Email-ID')?->getBodyAsString(), 'recipient' => implode(', ', array_map(fn ($address) => $address->getAddress(), $event->message->getTo())), 'subject' => $event->message->getSubject() ?? '', 'status' => config('mail.default') === 'log' ? 'logged' : 'sent']);
         });

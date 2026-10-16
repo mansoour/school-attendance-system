@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Feature;
 use App\Models\Page;
 use App\Models\Plan;
+use App\School\Roles;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -15,12 +16,19 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $permissions = ['admin.access', 'users.manage', 'roles.manage', 'billing.manage', 'plans.manage', 'pages.manage', 'notices.manage', 'email_templates.manage', 'emails.view', 'support.access', 'settings.manage', 'branding.manage', 'integrations.manage', 'health.view', 'audit.view', 'translations.edit', 'translations.publish'];
+        $permissions = array_merge($permissions, Roles::PERMISSIONS);
         foreach ($permissions as $name) {
             Permission::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
         }
         foreach (['owner' => $permissions, 'support' => ['admin.access', 'support.access', 'users.manage'], 'billing' => ['admin.access', 'users.manage', 'billing.manage', 'plans.manage'], 'translator' => ['admin.access', 'translations.edit', 'translations.publish'], 'content_reviewer' => ['admin.access', 'pages.manage', 'notices.manage']] as $name => $grants) {
             $role = Role::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
             $role->givePermissionTo($grants);
+        }
+        foreach (Roles::grants() as $name => $grants) {
+            $role = Role::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
+            if ($role->wasRecentlyCreated) {
+                $role->givePermissionTo($name === 'principal' ? [...$grants, 'audit.view'] : $grants);
+            }
         }
         $plan = Plan::firstOrCreate(['code' => 'free'], ['name' => ['en' => 'Free', 'ar' => 'مجاني'], 'description' => ['en' => 'The essentials to get started.', 'ar' => 'الأساسيات للبدء.'], 'is_free' => true, 'is_default' => true]);
         $feature = Feature::firstOrCreate(['code' => 'reports'], ['name' => ['en' => 'Example reports', 'ar' => 'تقارير تجريبية']]);

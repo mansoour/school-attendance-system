@@ -10,10 +10,10 @@ class SettingsService
         'security.registration_open' => true, 'security.email_verification' => true,
         'security.admin_two_factor_required' => false, 'security.recovery_codes' => true,
         'security.lockout_attempts' => 10, 'security.lockout_minutes' => 15,
-        'branding.name.en' => 'Starter Kit', 'branding.name.ar' => 'نقطة البداية',
+        'branding.name.en' => 'Tawasul', 'branding.name.ar' => 'منصة تواصل',
         'branding.color' => '#315a50', 'branding.logo.en' => null, 'branding.logo.ar' => null,
-        'homepage.title.en' => 'A fresh start for your next idea.', 'homepage.title.ar' => 'بداية جديدة لفكرتك القادمة.',
-        'homepage.description.en' => 'Your account, your workspace, your next chapter.', 'homepage.description.ar' => 'حسابك ومساحتك وخطوتك القادمة.',
+        'homepage.title.en' => 'Better communication, stronger attendance.', 'homepage.title.ar' => 'بالتواصل نعزز الانتظام ونبني المستقبل',
+        'homepage.description.en' => 'A daily attendance platform connecting school staff and guardians: attendance, excuses, notes, notifications and reports in one place.', 'homepage.description.ar' => 'منصة لمتابعة الحضور والغياب اليومي تربط منسوبات المدرسة بأولياء الأمور: تسجيل الغياب والتأخر، الأعذار، الملاحظات، الإشعارات والتقارير في مكان واحد.',
         'homepage.show_pricing' => true, 'staff_alerts.support_roles' => ['owner', 'support'],
     ];
 

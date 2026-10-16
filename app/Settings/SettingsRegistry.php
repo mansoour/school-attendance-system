@@ -2,6 +2,8 @@
 
 namespace App\Settings;
 
+use App\School\Notifier;
+
 class SettingsRegistry
 {
     public static function sections(): array
@@ -34,7 +36,7 @@ class SettingsRegistry
                 'plans.enabled' => $bool('Enable plans and subscriptions', false, 'Shows pricing and plan management, and enforces feature allowances. Disabling plans preserves subscriptions and gives access to enabled features without plan limits.'),
             ]],
             'appearance' => ['title' => 'Appearance', 'icon' => 'sun-moon', 'permission' => 'settings.manage', 'description' => 'Default language and light or dark appearance.', 'fields' => [
-                'appearance.locale' => $select('Default language', 'en', ['en' => 'English', 'ar' => 'Arabic'], 'Used until visitors choose a language. Members keep their saved language.'),
+                'appearance.locale' => $select('Default language', 'ar', ['en' => 'English', 'ar' => 'Arabic'], 'Used until visitors choose a language. Members keep their saved language.'),
                 'appearance.dark_enabled' => $bool('Offer dark mode', true, 'Adds a light, dark and system theme switch to the navigation bar.'),
                 'appearance.theme' => $select('Default theme', 'light', ['light' => 'Light', 'dark' => 'Dark', 'system' => 'System']),
             ]],
@@ -49,8 +51,8 @@ class SettingsRegistry
                 'storage.r2_bucket' => $text('R2 bucket', '', '', 'nullable|regex:/^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$/'),
             ]],
             'branding' => ['title' => 'Brand identity', 'icon' => 'badge', 'permission' => 'branding.manage', 'description' => 'Names and logos used across the website and administration.', 'fields' => [
-                'branding.name.en' => $text('Site name in English', 'Starter Kit', '', 'required|string|max:100'),
-                'branding.name.ar' => $text('Site name in Arabic', 'نقطة البداية', '', 'nullable|string|max:100'),
+                'branding.name.en' => $text('Site name in English', 'Tawasul', '', 'required|string|max:100'),
+                'branding.name.ar' => $text('Site name in Arabic', 'منصة تواصل', '', 'nullable|string|max:100'),
                 'branding.logo.en' => $upload('English logo', 'PNG, JPEG or WebP, up to 2 MB.'),
                 'branding.logo.ar' => $upload('Arabic logo', 'Falls back to the English logo when not provided.'),
             ]],
@@ -71,16 +73,33 @@ class SettingsRegistry
                 'branding.font_arabic' => $select('Arabic text and headings', 'ibm', ['ibm' => 'IBM Plex Sans Arabic', 'system' => 'System font']),
             ]],
             'homepage' => ['title' => 'Homepage', 'icon' => 'house', 'permission' => 'pages.manage', 'description' => 'Neutral homepage content for your next product.', 'fields' => [
-                'homepage.title.en' => $text('Heading in English', 'A fresh start for your next idea.', '', 'required|string|max:200'),
-                'homepage.title.ar' => $text('Heading in Arabic', 'بداية جديدة لفكرتك القادمة.'),
-                'homepage.description.en' => $area('Description in English', 'Your account, your workspace, your next chapter.'),
-                'homepage.description.ar' => $area('Description in Arabic', 'مساحة خاصة لإدارة حسابك ومتابعة كل جديد.'),
+                'homepage.title.en' => $text('Heading in English', 'Better communication, stronger attendance.', '', 'required|string|max:200'),
+                'homepage.title.ar' => $text('Heading in Arabic', 'بالتواصل نعزز الانتظام ونبني المستقبل'),
+                'homepage.description.en' => $area('Description in English', 'A daily attendance platform connecting school staff and guardians: attendance, excuses, notes, notifications and reports in one place.'),
+                'homepage.description.ar' => $area('Description in Arabic', 'منصة لمتابعة الحضور والغياب اليومي تربط منسوبات المدرسة بأولياء الأمور: تسجيل الغياب والتأخر، الأعذار، الملاحظات، الإشعارات والتقارير في مكان واحد.'),
                 'homepage.show_pricing' => $bool('Show the plans section', true, 'Visible only while plans are enabled.'),
             ]],
             'staff-alerts' => ['title' => 'Staff alerts', 'icon' => 'bell-ring', 'permission' => 'settings.manage', 'description' => 'Choose the staff roles notified when a support message arrives.', 'fields' => [
                 'staff_alerts.support_roles' => ['label' => 'Recipient roles', 'type' => 'roles', 'default' => ['owner', 'support'], 'rules' => 'nullable|array', 'help' => 'Recipients must also have permission to access the support inbox.'],
             ]],
         ];
+        $sections['guardians'] = ['title' => 'Guardian registration', 'icon' => 'user-plus', 'permission' => 'settings.manage', 'description' => 'How guardians register and link their accounts to students.', 'fields' => [
+            'guardians.match_mode' => $select('Student verification on registration', 'national_id_name', ['national_id_name' => 'Student national ID and full name', 'national_id_phone' => 'Student national ID and student phone', 'national_id_name_phone' => 'Student national ID, full name and phone'], 'Guardians must enter matching student details to link their account.'),
+            'guardians.require_approval' => $bool('Require staff approval for guardian links', false, 'When disabled, the link is approved as soon as the guardian verifies their email.'),
+            'guardians.fill_student_contact' => $bool('Fill missing guardian contact details on the student record', true, 'Copies the guardian name, phone, email and relation when the school has not provided them.'),
+        ]];
+        $sections['school-notifications'] = ['title' => 'School notifications', 'icon' => 'bell-ring', 'permission' => 'settings.manage', 'description' => 'Turn each school event on or off, choose in-app or email delivery, and choose which staff roles receive it.', 'fields' => [
+            'school_notify.absence_threshold' => $number('Repeated absence threshold (days in 30 days)', 3, 1, 30, 'Staff are alerted when a student reaches this many absences.'),
+        ]];
+        foreach (Notifier::events() as $event) {
+            $title = ucfirst(str_replace('_', ' ', $event));
+            $sections['school-notifications']['fields']["school_notify.$event.enabled"] = $bool("$title: enabled", $event !== 'student_absent_staff');
+            $sections['school-notifications']['fields']["school_notify.$event.database"] = $bool("$title: in-app", true);
+            $sections['school-notifications']['fields']["school_notify.$event.mail"] = $bool("$title: email", in_array($event, ['student_absent', 'excuse_reviewed', 'guardian_link_approved'], true));
+            if (in_array($event, Notifier::STAFF_EVENTS, true)) {
+                $sections['school-notifications']['fields']["school_notify.$event.roles"] = ['label' => "$title: recipient roles", 'type' => 'roles', 'default' => Notifier::DEFAULT_ROLES[$event], 'rules' => 'nullable|array', 'help' => ''];
+            }
+        }
         foreach (['x' => 'X', 'instagram' => 'Instagram', 'linkedin' => 'LinkedIn', 'youtube' => 'YouTube', 'facebook' => 'Facebook', 'tiktok' => 'TikTok', 'github' => 'GitHub', 'whatsapp' => 'WhatsApp'] as $key => $label) {
             $sections['social']['fields']['branding.social.'.$key] = $text($label, '', '', 'nullable|url:http,https|max:500');
         }

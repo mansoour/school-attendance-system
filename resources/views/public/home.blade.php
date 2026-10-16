@@ -1,7 +1,22 @@
 <x-shell>
 @php($settings=app(\App\Settings\SettingsService::class))
-<section class="hero"><div class="hero-copy"><p class="eyebrow"><span class="status-dot"></span> {{ __('A LITTLE SPACE. A LOT OF POSSIBILITY.') }}</p><h1>{{ $settings->get('homepage.title.'.app()->getLocale()) ?: $settings->get('homepage.title.en') }}</h1><p class="hero-description">{{ $settings->get('homepage.description.'.app()->getLocale()) ?: $settings->get('homepage.description.en') }}</p><div class="hero-actions"><a class="button" href="{{ route('register') }}">{{ __('Create your account') }} <x-ui-icon name="arrow-up-right"/></a><a class="text-link" href="{{ route('pages.show','about') }}">{{ __('Get to know us') }} <x-ui-icon name="arrow-right"/></a></div><p class="quiet">{{ __('Simple to begin. Built to grow with you.') }}</p></div><div class="hero-art" aria-hidden="true"><span class="art-label">01 / {{ __('A FRESH PERSPECTIVE') }}</span><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="art-tile"><span class="tile-star"><x-ui-icon name="sparkles"/></span></div><div class="art-caption"><span class="status-dot"></span> {{ __('Good things start here.') }}</div></div></section>
-<section class="intro-row"><p class="eyebrow">{{ __('MADE FOR YOUR EVERYDAY') }}</p><h2>{{ __('Everything in one thoughtful place.') }}</h2><p>{{ __('A clear, comfortable space to manage your account and stay connected.') }}</p></section>
-<section class="feature-grid"><article><span class="feature-number">01</span><h3>{{ __('Your space') }}</h3><p>{{ __('Keep your profile and preferences just the way you like them.') }}</p><a href="{{ route('profile.edit') }}">{{ __('Make it yours') }} <x-ui-icon name="arrow-up-right"/></a></article><article><span class="feature-number">02</span><h3>{{ __('Peace of mind') }}</h3><p>{{ __('Protect your account with an extra layer of sign-in security.') }}</p><a href="{{ route('security.edit') }}">{{ __('Explore security') }} <x-ui-icon name="arrow-up-right"/></a></article><article><span class="feature-number">03</span><h3>{{ __('A helping hand') }}</h3><p>{{ __('Questions, ideas, or a little guidance. We are here to help.') }}</p><a href="{{ route('contact') }}">{{ __('Talk to us') }} <x-ui-icon name="arrow-up-right"/></a></article></section>
-@if($settings->get('plans.enabled') && $settings->get('homepage.show_pricing'))<section class="cta-panel"><div><p class="eyebrow">{{ __('ROOM TO GROW') }}</p><h2>{{ __('Start with the essentials.') }}</h2></div><a class="button" href="{{ route('pricing') }}">{{ __('Explore plans') }} <x-ui-icon name="arrow-up-right"/></a></section>@endif
+@php($locale=app()->getLocale())
+<section class="home-hero">
+<div><p class="eyebrow"><span class="status-dot"></span> {{ __('Communication builds commitment') }}</p>
+<h1>{{ $settings->get('homepage.title.'.$locale) ?: $settings->get('homepage.title.en') }}</h1>
+<p class="hero-description">{{ $settings->get('homepage.description.'.$locale) ?: $settings->get('homepage.description.en') }}</p>
+<div class="hero-actions">@auth<a class="button" href="{{ route('dashboard') }}">{{ __('Go to dashboard') }} <x-ui-icon name="arrow-up-right"/></a>@else<a class="button" href="{{ route('login') }}"><x-ui-icon name="log-in"/>{{ __('Sign in') }}</a>@if($settings->get('security.registration_open'))<a class="button secondary" href="{{ route('register') }}"><x-ui-icon name="user-plus"/>{{ __('Guardian registration') }}</a>@endif @endauth</div>
+<p class="quiet">{{ __('School staff accounts are created by the school administration.') }}</p></div>
+<div class="home-art" aria-hidden="true">
+<div class="stat tone-present"><span class="stat-icon"><x-ui-icon name="calendar-check"/></span><div><strong>{{ __('Daily attendance') }}</strong><span>{{ __('Record absences and late arrivals for every class in minutes.') }}</span></div></div>
+<div class="stat tone-violet"><span class="stat-icon"><x-ui-icon name="message-circle"/></span><div><strong>{{ __('Instant guardian contact') }}</strong><span>{{ __('Notifications, WhatsApp, calls and email from one screen.') }}</span></div></div>
+<div class="stat tone-excused"><span class="stat-icon"><x-ui-icon name="file-check"/></span><div><strong>{{ __('Online excuses') }}</strong><span>{{ __('Guardians send excuses and the right staff member reviews them.') }}</span></div></div>
+<div class="stat tone-late"><span class="stat-icon"><x-ui-icon name="chart-column"/></span><div><strong>{{ __('Reports and statistics') }}</strong><span>{{ __('Absence rates by grade and class, exportable to Excel and PDF.') }}</span></div></div>
+</div>
+</section>
+<section class="home-roles">
+@foreach(['principal'=>'crown','vice_principal'=>'users-round','student_affairs'=>'file-text','health_guide'=>'heart-pulse','counselor'=>'user-round','guardian'=>'users'] as $role=>$icon)
+<div class="role-card"><span class="role-icon"><x-ui-icon :name="$icon"/></span><strong>{{ __('school.roles.'.$role) }}</strong><small>{{ __('school.role_descriptions.'.$role) }}</small></div>
+@endforeach
+</section>
 </x-shell>

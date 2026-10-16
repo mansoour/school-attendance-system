@@ -162,6 +162,10 @@ Tests use isolated **in-memory SQLite** and do not require live integration cred
 - [Changelog](CHANGELOG.md)
 - [Third-party notices](docs/THIRD_PARTY.md)
 
+## Credits
+
+Developed by **[Mansoour](https://github.com/mansoour)** · [mansoour.com](https://mansoour.com)
+
 ## License
 
-[MIT](LICENSE). Bundled fonts and third-party packages retain their own licenses and notices.
+[MIT](LICENSE) © 2026 Mansoour. The copyright notice and the credit in [NOTICE.md](NOTICE.md) must be kept in all copies and derivative works. Bundled fonts and third-party packages retain their own licenses and notices.

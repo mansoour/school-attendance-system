@@ -1,4 +1,7 @@
 {
+    "name": "school-attendance-system",
+    "author": "Mansoour (https://mansoour.com)",
+    "homepage": "https://github.com/mansoour/school-attendance-system",
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",

@@ -8,6 +8,14 @@
         "framework"
     ],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Mansoour",
+            "homepage": "https://mansoour.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/mansoour/school-attendance-system",
     "require": {
         "php": "^8.3",
         "bacon/bacon-qr-code": "^3.1",

@@ -55,3 +55,6 @@ AGENTS.md
 /public/branding/
 /backups/
 /exports/
+
+# Local tool settings
+/.claude/

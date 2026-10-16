@@ -3,8 +3,6 @@
 namespace Tests\Feature;
 
 use App\Admin\Resources;
-use App\Billing\Entitlements;
-use App\Models\Feature;
 use App\Models\TranslationRevision;
 use App\Models\User;
 use App\Settings\SecretStore;
@@ -38,24 +36,6 @@ class AdministrationSettingsTest extends TestCase
     private function settings(): SettingsService
     {
         return app(SettingsService::class);
-    }
-
-    public function test_plans_start_disabled_and_can_be_enabled_without_losing_data(): void
-    {
-        $this->assertFalse($this->settings()->get('plans.enabled'));
-        $this->get('/pricing')->assertNotFound();
-        $user = $this->owner();
-        $this->actingAs($user)->get('/admin/manage/plans')->assertNotFound();
-        $this->getJson('/api/v1/me')->assertJsonPath('plans_enabled', false)->assertJsonPath('plan', null);
-        $this->get('/')->assertDontSee(route('pricing'), false);
-        $this->post('/admin/configuration/plans', ['plans_enabled' => 1])->assertRedirect(route('password.confirm'));
-        $this->withSession(['auth.password_confirmed_at' => time()])->post('/admin/configuration/plans', ['plans_enabled' => 1])->assertSessionHasNoErrors();
-        $this->get('/pricing')->assertOk();
-        $this->get('/admin/manage/plans')->assertOk();
-        $this->post('/admin/configuration/plans', ['plans_enabled' => 0])->assertSessionHasNoErrors();
-        $this->assertDatabaseCount('plans', 1);
-        app(Entitlements::class)->consume($user, Feature::first()->code);
-        $this->assertDatabaseCount('feature_usages', 0);
     }
 
     public function test_every_settings_section_renders_in_arabic_and_saves_validated_values(): void
@@ -98,7 +78,7 @@ class AdministrationSettingsTest extends TestCase
         $this->post('/login', ['email' => $staff->email, 'password' => 'password'])->assertRedirect();
         $this->assertAuthenticatedAs($staff);
         $this->post('/logout');
-        $this->actingAs(User::factory()->create())->get('/app')->assertStatus(503);
+        $this->actingAs(User::factory()->create())->get('/school')->assertStatus(503);
         $this->actingAs($this->owner())->get('/admin/configuration/maintenance')->assertOk();
     }
 
@@ -160,7 +140,6 @@ class AdministrationSettingsTest extends TestCase
     {
         $user = $this->owner();
         $user->update(['locale' => 'ar']);
-        $this->settings()->set('plans.enabled', true);
         $this->actingAs($user);
         foreach (['/admin', '/admin/members', '/admin/roles', '/admin/support', '/admin/translations', '/admin/integrations', '/admin/health', '/admin/audit', '/admin/emails', '/account', '/account/security'] as $url) {
             $this->get($url)->assertOk();
@@ -185,8 +164,8 @@ class AdministrationSettingsTest extends TestCase
         $this->call('POST', '/webhooks/resend', [], [], [], $server, $body)->assertUnauthorized();
         $server['HTTP_SVIX_SIGNATURE'] = 'v1,'.$signature;
         $this->call('POST', '/webhooks/resend', [], [], [], $server, $body)->assertNoContent();
-        $this->call('POST','/webhooks/resend',[],[],[],$server,$body)->assertNoContent();
-        $this->assertDatabaseCount('webhook_receipts',1);
-        $this->assertDatabaseHas('email_logs',['provider_id' => 'email-1', 'status' => 'delivered']);
+        $this->call('POST', '/webhooks/resend', [], [], [], $server, $body)->assertNoContent();
+        $this->assertDatabaseCount('webhook_receipts', 1);
+        $this->assertDatabaseHas('email_logs', ['provider_id' => 'email-1', 'status' => 'delivered']);
     }
 }

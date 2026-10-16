@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Plan;
-use App\Models\Subscription;
 use App\Models\User;
-use App\Notifications\MemberNotification;
+use App\School\Roles;
 use App\Services\Audit\AuditLogger;
 use App\Settings\SettingsService;
 use Illuminate\Http\Request;
@@ -19,14 +17,10 @@ class MemberController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::with('roles', 'subscriptions.plan')->when($request->query('q'), fn ($q, $term) => $q->where(fn ($q) => $q->where('name', 'like', '%'.$term.'%')->orWhere('email', 'like', '%'.$term.'%')))
-            ->when($request->query('staff') === '1', fn ($q) => $q->permission('admin.access'))
-            ->when(in_array($request->query('marketing'), ['0', '1'], true), fn ($q) => $q->where('marketing_opt_in', $request->query('marketing')));
-        if (app(SettingsService::class)->get('plans.enabled') && $request->filled('plan')) {
-            $query->whereHas('subscriptions', fn ($q) => $q->where('plan_id', $request->query('plan'))->where('status', 'active')->where('starts_at', '<=', now())->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '>', now())));
-        }
+        $query = User::with('roles', 'school')->when($request->query('q'), fn ($q, $term) => $q->where(fn ($q) => $q->where('name', 'like', '%'.$term.'%')->orWhere('email', 'like', '%'.$term.'%')))
+            ->when($request->query('staff') === '1', fn ($q) => $q->role([...Roles::STAFF, 'owner']));
 
-        return view('admin.members', ['users' => $query->latest()->paginate(20)->withQueryString(), 'roles' => Role::all(), 'plans' => Plan::all()]);
+        return view('admin.members', ['users' => $query->latest()->paginate(20)->withQueryString(), 'roles' => Role::all()]);
     }
 
     public function unlock(User $user)
@@ -102,29 +96,6 @@ class MemberController extends Controller
         abort_if($user->hasRole('owner') || in_array('owner', $data['roles'] ?? []), 403);
         $user->syncRoles($data['roles'] ?? []);
         app(AuditLogger::class)->record('members.roles_updated', $user);
-
-        return back()->with('status', __('Saved.'));
-    }
-
-    public function subscribe(Request $request, User $user)
-    {
-        $data = $request->validate(['plan_id' => 'required|exists:plans,id', 'starts_at' => 'required|date', 'ends_at' => 'nullable|date|after:starts_at']);
-        DB::transaction(function () use ($data, $user, $request) {
-            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
-            $user->subscriptions()->where('status', 'active')->update(['status' => 'cancelled']);
-            $subscription = $user->subscriptions()->create($data + ['created_by' => $request->user()->id, 'source' => 'manual']);
-            app(AuditLogger::class)->record('subscription.assigned', $subscription);
-            $user->notify(new MemberNotification('plan_changed'));
-        });
-
-        return back()->with('status', __('Saved.'));
-    }
-
-    public function cancel(Subscription $subscription)
-    {
-        $subscription->update(['status' => 'cancelled']);
-        app(AuditLogger::class)->record('subscription.cancelled', $subscription);
-        $subscription->user->notify(new MemberNotification('plan_changed'));
 
         return back()->with('status', __('Saved.'));
     }

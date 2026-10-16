@@ -14,7 +14,7 @@ class SettingsService
         'branding.color' => '#315a50', 'branding.logo.en' => null, 'branding.logo.ar' => null,
         'homepage.title.en' => 'Better communication, stronger attendance.', 'homepage.title.ar' => 'بالتواصل نعزز الانتظام ونبني المستقبل',
         'homepage.description.en' => 'A daily attendance platform connecting school staff and guardians: attendance, excuses, notes, notifications and reports in one place.', 'homepage.description.ar' => 'منصة لمتابعة الحضور والغياب اليومي تربط منسوبات المدرسة بأولياء الأمور: تسجيل الغياب والتأخر، الأعذار، الملاحظات، الإشعارات والتقارير في مكان واحد.',
-        'homepage.show_pricing' => true, 'staff_alerts.support_roles' => ['owner', 'support'],
+        'staff_alerts.support_roles' => ['owner', 'support'],
     ];
 
     public function get(string $key): mixed

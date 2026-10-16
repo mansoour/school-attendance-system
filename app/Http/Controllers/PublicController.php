@@ -6,7 +6,6 @@ use App\Integrations\Recaptcha;
 use App\Localization\LocaleRegistry;
 use App\Models\ContactMessage;
 use App\Models\Page;
-use App\Models\Plan;
 use App\Models\TranslationRevision;
 use App\Models\User;
 use App\Notifications\MemberNotification;
@@ -18,17 +17,12 @@ class PublicController extends Controller
 {
     public function home()
     {
-        return view('public.home', ['plans' => app(SettingsService::class)->get('plans.enabled') ? Plan::where('is_public', true)->ordered()->get() : collect()]);
+        return view('public.home');
     }
 
     public function page(string $slug)
     {
         return view('public.page', ['page' => Page::where('slug', $slug)->where('is_published', true)->firstOrFail()]);
-    }
-
-    public function pricing()
-    {
-        return view('public.pricing', ['plans' => Plan::where('is_public', true)->ordered()->get()]);
     }
 
     public function contact(Request $request)

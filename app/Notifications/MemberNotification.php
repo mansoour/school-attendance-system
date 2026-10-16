@@ -12,7 +12,7 @@ class MemberNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public const EVENTS = ['welcome', 'plan_changed', 'support_received', 'security'];
+    public const EVENTS = ['welcome', 'support_received', 'security'];
 
     public function __construct(public string $event, public array $parameters = [])
     {

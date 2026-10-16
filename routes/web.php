@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::post('/webhooks/resend', ResendWebhookController::class)->middleware('throttle:120,1');
-Route::get('/pricing', [PublicController::class, 'pricing'])->middleware('plans.enabled')->name('pricing');
 Route::get('/branding-assets/{asset}', BrandingAssetController::class)->name('branding.asset');
 Route::view('/contact', 'public.contact')->name('contact');
 Route::post('/contact', [PublicController::class, 'contact'])->middleware('throttle:5,1');
@@ -41,15 +40,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/account/export', [MemberController::class, 'export'])->middleware(['verified', 'password.confirm', 'throttle:5,1'])->name('account.export');
 });
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', fn () => auth()->user()->can('school.access') ? redirect()->route('school.dashboard') : redirect('/app'))->name('dashboard');
-    Route::view('/app/{path?}', 'member')->where('path', '.*')->name('member');
+    Route::get('/dashboard', fn () => auth()->user()->can('school.access') ? redirect()->route('school.dashboard') : redirect()->route(auth()->user()->can('admin.access') ? 'admin.index' : 'profile.edit'))->name('dashboard');
+    Route::redirect('/app', '/dashboard')->name('member');
     Route::prefix('/api/v1')->group(function () {
-        Route::get('/me', [MemberController::class, 'me']);
         Route::put('/locale', [PublicController::class, 'locale']);
         Route::get('/notifications', [MemberController::class, 'notifications']);
         Route::post('/notifications/read-all', [MemberController::class, 'readAll']);
         Route::post('/notifications/{id}/read', [MemberController::class, 'read']);
-        Route::put('/notification-preferences', [MemberController::class, 'preferences']);
     });
 });
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'can:admin.access', 'admin.mfa'])->group(function () {
@@ -77,16 +74,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'can:adm
     Route::post('/members/{user}/unlock', [AdminMemberController::class, 'unlock'])->middleware(['can:users.manage', 'password.confirm'])->name('members.unlock');
     Route::get('/members', [AdminMemberController::class, 'index'])->middleware('can:users.manage')->name('members');
     Route::post('/members/{user}/roles', [AdminMemberController::class, 'assignRole'])->middleware(['can:roles.manage', 'password.confirm'])->name('members.roles');
-    Route::post('/members/{user}/subscription', [AdminMemberController::class, 'subscribe'])->middleware('can:billing.manage')->middleware('plans.enabled')->name('members.subscribe');
-    Route::delete('/subscriptions/{subscription}', [AdminMemberController::class, 'cancel'])->middleware('can:billing.manage')->middleware('plans.enabled')->name('subscriptions.cancel');
     Route::get('/roles', [AdminMemberController::class, 'roles'])->middleware('can:roles.manage')->name('roles');
     Route::post('/roles', [AdminMemberController::class, 'saveRole'])->middleware(['can:roles.manage', 'password.confirm'])->name('roles.save');
     Route::patch('/roles/{role}', [AdminMemberController::class, 'updateRole'])->middleware(['can:roles.manage', 'password.confirm'])->name('roles.update');
     Route::delete('/roles/{role}', [AdminMemberController::class, 'deleteRole'])->middleware(['can:roles.manage', 'password.confirm'])->name('roles.delete');
-    Route::get('/manage/{resource}', [ResourceController::class, 'index'])->middleware('plans.enabled')->name('resources');
-    Route::get('/manage/{resource}/edit/{id?}', [ResourceController::class, 'edit'])->middleware('plans.enabled')->name('resources.edit');
-    Route::post('/manage/{resource}/{id?}', [ResourceController::class, 'save'])->middleware('plans.enabled')->name('resources.save');
-    Route::delete('/manage/{resource}/{id}', [ResourceController::class, 'destroy'])->middleware('plans.enabled')->name('resources.delete');
+    Route::get('/manage/{resource}', [ResourceController::class, 'index'])->name('resources');
+    Route::get('/manage/{resource}/edit/{id?}', [ResourceController::class, 'edit'])->name('resources.edit');
+    Route::post('/manage/{resource}/{id?}', [ResourceController::class, 'save'])->name('resources.save');
+    Route::delete('/manage/{resource}/{id}', [ResourceController::class, 'destroy'])->name('resources.delete');
 });
 require __DIR__.'/school.php';
 require __DIR__.'/auth.php';

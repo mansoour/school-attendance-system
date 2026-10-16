@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "starter-kit/application",
+    "name": "tawasul/school-attendance-system",
     "type": "project",
-    "description": "Independent, product-neutral Laravel starter kit.",
+    "description": "Arabic-first daily school attendance system.",
     "keywords": [
         "laravel",
         "framework"

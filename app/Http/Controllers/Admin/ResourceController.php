@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Admin\Resources;
 use App\Http\Controllers\Controller;
-use App\Models\Feature;
-use App\Models\Plan;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +25,7 @@ class ResourceController extends Controller
         [$model, $permission, $fields] = Resources::get($resource);
         Gate::authorize($permission);
 
-        return view('admin.edit', ['resource' => $resource, 'record' => $id ? $model::findOrFail($id) : new $model, 'fields' => $fields, 'features' => $resource === 'plans' ? Feature::all() : collect()]);
+        return view('admin.edit', ['resource' => $resource, 'record' => $id ? $model::findOrFail($id) : new $model, 'fields' => $fields]);
     }
 
     public function save(Request $request, string $resource, ?int $id = null)
@@ -40,28 +38,14 @@ class ResourceController extends Controller
                 $rules[$unique] = [...explode('|', $rules[$unique]), Rule::unique($record->getTable(), $unique)->ignore($record->id)];
             }
         }
-        if ($resource === 'plans') {
-            $rules['features'] = 'sometimes|array';
-            $rules['features.*.id'] = 'required|integer|exists:features,id|distinct';
-            $rules['features.*.enabled'] = 'required|boolean';
-            $rules['features.*.allowance'] = 'nullable|integer|min:0';
-        }
         $attributes = collect(array_keys($rules))->mapWithKeys(fn ($field) => [$field => __(ucwords(str_replace(['.', '_'], ' ', $field)))])->all();
         $data = $request->validate($rules, [], $attributes);
         if ($resource === 'email-templates' && ($data['event'] === 'security' || $record->event === 'security')) {
             $data['event'] = 'security';
             $data['is_active'] = true;
         }
-        $features = $data['features'] ?? [];
-        unset($data['features']);
-        DB::transaction(function () use ($record, $resource, $data, $features) {
-            if ($resource === 'plans' && $data['is_default']) {
-                Plan::query()->update(['is_default' => false]);
-            }
+        DB::transaction(function () use ($record, $resource, $data) {
             $record->fill($data)->save();
-            if ($resource === 'plans') {
-                $record->features()->sync(collect($features)->filter(fn ($f) => $f['enabled'])->mapWithKeys(fn ($f) => [$f['id'] => ['allowance' => $f['allowance'] ?? null]])->all());
-            }
             app(AuditLogger::class)->record($resource.'.saved', $record);
         });
 
@@ -73,7 +57,6 @@ class ResourceController extends Controller
         [$model, $permission] = Resources::get($resource);
         Gate::authorize($permission);
         $record = $model::findOrFail($id);
-        abort_if($resource === 'plans' && ($record->is_default || $record->subscriptions()->exists()), 409, __('Default or assigned plans cannot be deleted.'));
         abort_if($resource === 'email-templates' && $record->event === 'security', 403);
         app(AuditLogger::class)->record($resource.'.deleted', $record);
         $record->delete();

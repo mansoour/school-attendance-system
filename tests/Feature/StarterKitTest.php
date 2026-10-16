@@ -3,10 +3,7 @@
 namespace Tests\Feature;
 
 use App\Admin\Resources;
-use App\Billing\Entitlements;
 use App\Models\BrandingAsset;
-use App\Models\Feature;
-use App\Models\Plan;
 use App\Models\TranslationRevision;
 use App\Models\User;
 use App\Notifications\MemberNotification;
@@ -21,7 +18,6 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class StarterKitTest extends TestCase
@@ -48,8 +44,7 @@ class StarterKitTest extends TestCase
 
     public function test_public_pages_and_rtl_render_without_domain_dependencies(): void
     {
-        app(SettingsService::class)->set('plans.enabled', true);
-        foreach (['/', '/pricing', '/contact', '/pages/about', '/pages/help', '/pages/privacy', '/pages/terms'] as $url) {
+        foreach (['/', '/contact', '/pages/about', '/pages/help', '/pages/privacy', '/pages/terms'] as $url) {
             $this->get($url)->assertOk();
         }
         $this->withSession(['locale' => 'ar'])->get('/')->assertOk()->assertSee('dir="rtl"', false)->assertSee('بالتواصل نعزز الانتظام');
@@ -141,7 +136,6 @@ class StarterKitTest extends TestCase
     public function test_all_owner_admin_views_render(): void
     {
         $this->actingAs($this->staff());
-        app(SettingsService::class)->set('plans.enabled', true);
         foreach (['/admin', '/admin/members', '/admin/roles', '/admin/support', '/admin/translations', '/admin/integrations', '/admin/health', '/admin/audit', '/admin/emails', '/admin/configuration/settings', '/admin/configuration/branding', '/admin/configuration/homepage', '/admin/configuration/staff-alerts'] as $url) {
             $this->get($url)->assertOk();
         }
@@ -190,8 +184,7 @@ class StarterKitTest extends TestCase
         $id = (string) Str::uuid();
         $other->notifications()->create(['id' => $id, 'type' => MemberNotification::class, 'data' => ['event' => 'welcome', 'parameters' => []]]);
         $this->actingAs($user)->postJson('/api/v1/notifications/'.$id.'/read')->assertNotFound();
-        $this->putJson('/api/v1/notification-preferences', ['preferences' => ['security' => ['database' => false, 'mail' => false]]])->assertUnprocessable();
-        $this->putJson('/api/v1/notification-preferences', ['preferences' => ['welcome' => ['database' => true, 'mail' => false]]])->assertNoContent();
+        $user->forceFill(['notification_preferences' => ['welcome' => ['database' => true, 'mail' => false], 'security' => ['database' => false, 'mail' => false]]])->save();
         $this->assertSame(['database'], (new MemberNotification('welcome'))->via($user->fresh()));
         $this->assertSame(['database', 'mail'], (new MemberNotification('security'))->via($user->fresh()));
     }
@@ -204,31 +197,10 @@ class StarterKitTest extends TestCase
         $this->assertDatabaseHas('audit_logs', ['action' => 'support.updated']);
     }
 
-    public function test_entitlements_enforce_allowances_and_disabled_features(): void
-    {
-        $user = User::factory()->create();
-        $service = app(Entitlements::class);
-        app(SettingsService::class)->set('plans.enabled', true);
-        Plan::first()->features()->updateExistingPivot(Feature::first()->id, ['allowance' => 1]);
-        $service->consume($user, 'reports');
-        try {
-            $service->consume($user, 'reports');
-            $this->fail('Allowance was not enforced');
-        } catch (HttpException $exception) {
-            $this->assertSame(429, $exception->getStatusCode());
-        }
-        Feature::first()->update(['is_enabled' => false]);
-        $this->assertFalse($service->allows($user, 'reports'));
-        $this->assertFalse($service->allows($user, 'unknown'));
-        $this->assertDatabaseHas('feature_usages', ['user_id' => $user->id, 'used' => 1]);
-    }
-
-    public function test_owner_role_and_default_plan_cannot_be_deleted(): void
+    public function test_owner_role_cannot_be_deleted(): void
     {
         $this->actingAs($this->staff())->withSession(['auth.password_confirmed_at' => time()]);
-        app(SettingsService::class)->set('plans.enabled', true);
         $this->delete('/admin/roles/'.Role::findByName('owner')->id)->assertConflict();
-        $this->delete('/admin/manage/plans/'.Plan::first()->id)->assertConflict();
         $this->post('/admin/roles', ['name' => 'owner', 'permissions' => []])->assertForbidden();
     }
 

@@ -32,9 +32,6 @@ class SettingsRegistry
                 'security.recaptcha_register' => $bool('Use reCAPTCHA on registration', false, 'Requires the site key and secret key in Integrations.'),
                 'security.recaptcha_score' => $number('Minimum reCAPTCHA score', 5, 1, 9, 'A value of 5 means 0.5. Submissions below this score are refused.'),
             ]],
-            'plans' => ['title' => 'Plans and subscriptions', 'icon' => 'layers', 'permission' => 'settings.manage', 'description' => 'Make membership plans optional for each future product.', 'fields' => [
-                'plans.enabled' => $bool('Enable plans and subscriptions', false, 'Shows pricing and plan management, and enforces feature allowances. Disabling plans preserves subscriptions and gives access to enabled features without plan limits.'),
-            ]],
             'appearance' => ['title' => 'Appearance', 'icon' => 'sun-moon', 'permission' => 'settings.manage', 'description' => 'Default language and light or dark appearance.', 'fields' => [
                 'appearance.locale' => $select('Default language', 'ar', ['en' => 'English', 'ar' => 'Arabic'], 'Used until visitors choose a language. Members keep their saved language.'),
                 'appearance.dark_enabled' => $bool('Offer dark mode', true, 'Adds a light, dark and system theme switch to the navigation bar.'),
@@ -77,7 +74,6 @@ class SettingsRegistry
                 'homepage.title.ar' => $text('Heading in Arabic', 'بالتواصل نعزز الانتظام ونبني المستقبل'),
                 'homepage.description.en' => $area('Description in English', 'A daily attendance platform connecting school staff and guardians: attendance, excuses, notes, notifications and reports in one place.'),
                 'homepage.description.ar' => $area('Description in Arabic', 'منصة لمتابعة الحضور والغياب اليومي تربط منسوبات المدرسة بأولياء الأمور: تسجيل الغياب والتأخر، الأعذار، الملاحظات، الإشعارات والتقارير في مكان واحد.'),
-                'homepage.show_pricing' => $bool('Show the plans section', true, 'Visible only while plans are enabled.'),
             ]],
             'staff-alerts' => ['title' => 'Staff alerts', 'icon' => 'bell-ring', 'permission' => 'settings.manage', 'description' => 'Choose the staff roles notified when a support message arrives.', 'fields' => [
                 'staff_alerts.support_roles' => ['label' => 'Recipient roles', 'type' => 'roles', 'default' => ['owner', 'support'], 'rules' => 'nullable|array', 'help' => 'Recipients must also have permission to access the support inbox.'],
@@ -104,7 +100,7 @@ class SettingsRegistry
             $sections['social']['fields']['branding.social.'.$key] = $text($label, '', '', 'nullable|url:http,https|max:500');
         }
         $labels = ['primary' => 'Primary color', 'cream' => 'Hero and card background', 'accent' => 'Highlights', 'text' => 'Main text', 'sage' => 'Soft background', 'muted' => 'Secondary text', 'border' => 'Borders and dividers', 'surface' => 'Page and form background'];
-        $colors = ['light' => ['#183D32', '#F5F5EC', '#BDFB60', '#202D27', '#DCE5D8', '#69756C', '#E2E6DC', '#FFFFFF'], 'dark' => ['#7FBFA6', '#14271F', '#BDFB60', '#F5F5EC', '#253C31', '#BAC7BF', '#3C5146', '#102219']];
+        $colors = ['light' => ['#0E7C86', '#F6F4FF', '#8B5CF6', '#1E293B', '#E6F6F4', '#64748B', '#E6E3F3', '#FFFFFF'], 'dark' => ['#5EEAD4', '#1A1730', '#C4B5FD', '#F1F5F9', '#1F2E3A', '#A5B4C8', '#2E2A4A', '#13111F']];
         foreach ($colors as $theme => $values) {
             foreach (array_keys($labels) as $i => $token) {
                 $sections['styling']['fields']["styling.$theme.$token"] = ['label' => $labels[$token], 'theme' => $theme, 'default' => $values[$i], 'type' => 'color', 'rules' => 'regex:/^#[0-9a-fA-F]{6}$/'];

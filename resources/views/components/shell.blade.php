@@ -32,9 +32,9 @@ $direction=\App\Models\Locale::find($locale)?->direction ?? 'ltr';
 :root { --body-font:{{ $settings->get('branding.font_body')==='inter' ? 'Starter Inter' : 'system-ui' }}; --heading-font:{{ ['intertight'=>'Starter Inter Tight','inter'=>'Starter Inter','system'=>'system-ui'][$settings->get('branding.font_heading')] ?? 'system-ui' }}; --arabic-font:{{ $settings->get('branding.font_arabic')==='ibm' ? 'Starter IBM Plex Sans Arabic' : 'Tahoma' }}; }
 </style>
 @vite(['resources/css/app.css','resources/css/theme.css','resources/js/app.js'])</head>
-<body class="{{ $admin ? 'admin-body' : '' }}" x-data="{sidebarOpen:false}">
+<body class="{{ $admin ? 'admin-body' : '' }}" x-data="{sidebarOpen:false}" :class="{'menu-open':sidebarOpen}" @keydown.escape.window="sidebarOpen=false" @resize.window="if(innerWidth>900) sidebarOpen=false">
 <header class="site-header {{ $admin?'admin-header':'' }}">
-@if($admin)<button type="button" class="icon-button mobile-menu" @click="sidebarOpen=!sidebarOpen" :aria-expanded="sidebarOpen" aria-controls="admin-sidebar" aria-label="{{ __('Toggle navigation') }}"><x-ui-icon name="menu"/></button>@endif
+<button type="button" class="icon-button mobile-menu {{ $admin ? '' : 'public-menu-toggle' }}" @click="sidebarOpen=!sidebarOpen" :aria-expanded="sidebarOpen" aria-controls="{{ $admin ? 'admin-sidebar' : 'public-mobile-nav' }}" aria-label="{{ __('Toggle navigation') }}"><span x-show="!sidebarOpen"><x-ui-icon name="menu"/></span><span x-show="sidebarOpen" x-cloak><x-ui-icon name="x"/></span></button>
 <a class="brand" href="{{ route('home') }}">@if($logo)<img src="{{ $assets->url($logo) }}" alt="{{ $brand }}" class="brand-logo">@else<img src="{{ asset('images/sized/brand-128.webp') }}" alt="" class="brand-img" width="40" height="40"><span>{{ $brand }}</span>@endif</a>
 @if(!$admin)<nav aria-label="{{ __('Main navigation') }}"><a href="{{ route('home') }}">{{ __('Home') }}</a><a href="{{ route('pages.show','about') }}">{{ __('About') }}</a><a href="{{ route('contact') }}">{{ __('Contact') }}</a></nav>@else<span class="admin-heading">{{ $heading ?? __('Administration') }}</span>@endif
 <div class="header-actions">
@@ -51,6 +51,16 @@ $direction=\App\Models\Locale::find($locale)?->direction ?? 'ltr';
 <div class="dropdown user-dropdown" x-data="{open:false}" @click.outside="open=false" @keydown.escape.window="open=false"><button type="button" class="user-control" @click="open=!open" :aria-expanded="open"><span class="avatar">{{ mb_substr(auth()->user()->name,0,1) }}</span><span class="user-name">{{ auth()->user()->name }}</span><x-ui-icon name="chevron-down"/></button><div class="dropdown-menu" x-show="open" x-cloak><div class="dropdown-identity"><strong>{{ auth()->user()->name }}</strong><small dir="ltr">{{ auth()->user()->email }}</small></div>@can('school.access')<a href="{{ route('school.dashboard') }}"><x-ui-icon name="school"/>{{ __('Dashboard') }}</a>@endcan<a href="{{ route('profile.edit') }}"><x-ui-icon name="user"/>{{ __('Account') }}</a><a href="{{ route('security.edit') }}"><x-ui-icon name="shield-check"/>{{ __('Security') }}</a>@can('admin.access')<a href="{{ route('admin.index') }}"><x-ui-icon name="settings"/>{{ __('Administration') }}</a>@endcan<form method="post" action="{{ route('logout') }}">@csrf<button class="text-button"><x-ui-icon name="log-out"/>{{ __('Log Out') }}</button></form></div></div>
 @else<a class="button small secondary" href="{{ route('login') }}"><x-ui-icon name="log-in"/>{{ __('Sign in') }}</a>@if($settings->get('security.registration_open'))<a class="button small" href="{{ route('register') }}"><x-ui-icon name="user-plus"/>{{ __('Guardian registration') }}</a>@endif @endauth
 </div></header>
+@if(!$admin)
+<nav id="public-mobile-nav" class="public-mobile-nav" x-show="sidebarOpen" x-cloak x-transition.opacity @click.outside="if(!$event.target.closest('.public-menu-toggle')) sidebarOpen=false" aria-label="{{ __('Main navigation') }}">
+<a href="{{ route('home') }}"><x-ui-icon name="house"/>{{ __('Home') }}</a>
+<a href="{{ route('pages.show','about') }}"><x-ui-icon name="info"/>{{ __('About') }}</a>
+<a href="{{ route('contact') }}"><x-ui-icon name="mail"/>{{ __('Contact') }}</a>
+<a href="{{ route('pages.show','help') }}"><x-ui-icon name="circle-help"/>{{ __('Help') }}</a>
+<div class="public-mobile-actions">@auth<a class="button" href="{{ route('dashboard') }}"><x-ui-icon name="layout-dashboard"/>{{ __('Go to dashboard') }}</a>@else<a class="button" href="{{ route('login') }}"><x-ui-icon name="log-in"/>{{ __('Sign in') }}</a>@if($settings->get('security.registration_open'))<a class="button secondary" href="{{ route('register') }}"><x-ui-icon name="user-plus"/>{{ __('Guardian registration') }}</a>@endif @endauth</div>
+</nav>
+@endif
+<div class="nav-backdrop" x-show="sidebarOpen" x-cloak x-transition.opacity @click="sidebarOpen=false"></div>
 @if(!$admin)@foreach(['above','below'] as $position)@foreach(\App\Models\SiteNotice::showing($position) as $notice)<div class="notice" x-data="{visible: !localStorage.getItem('notice-{{ $notice['id'] }}')}" x-show="visible">{{ $notice['message'] }} @if($notice['link_url'])<a href="{{ $notice['link_url'] }}">{{ $notice['link_label'] }}</a>@endif @if($notice['dismissible'])<button type="button" aria-label="{{ __('Dismiss') }}" @click="visible=false;localStorage.setItem('notice-{{ $notice['id'] }}','1')"><x-ui-icon name="x"/></button>@endif</div>@endforeach @endforeach @endif
 <main class="{{ $admin?'admin-main':'container' }}">
 @if(!$admin)@include('partials.feedback')@endif

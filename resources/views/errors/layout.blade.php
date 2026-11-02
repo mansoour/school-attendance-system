@@ -7,5 +7,6 @@ img{width:min(260px,70vw);height:auto;display:block;margin:0 auto 6px}
 strong{display:block;font-size:3.4rem;font-weight:800;line-height:1;background:linear-gradient(135deg,#0e9aa7,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
 h1{font-size:1.6rem;margin:10px 0 6px}p{color:#64748b;margin:0 0 22px}
 a{display:inline-block;background:linear-gradient(135deg,#0e9aa7,#8b5cf6);color:#fff;padding:12px 26px;border-radius:12px;text-decoration:none;font-weight:700;box-shadow:0 8px 20px rgba(139,92,246,.3)}
-small{display:block;margin-top:22px;color:#94a3b8;font-size:.75rem}small a{all:unset;color:#8b5cf6;cursor:pointer}
-</style></head><body><main><img src="{{ asset('images/sized/'.$image.'.webp') }}" alt=""><strong>{{ $code }}</strong><h1>{{ __($message) }}</h1><p>{{ __('Please try again later.') }}</p><a href="{{ url('/') }}">{{ __('Return home') }}</a></main></body></html>
+code{background:#f1ebff;color:#6d28d9;padding:2px 8px;border-radius:6px;font-weight:700}.ref{font-size:.85rem}small{display:block;margin-top:22px;color:#94a3b8;font-size:.75rem}small a{all:unset;color:#8b5cf6;cursor:pointer}
+</style></head><body><main><img src="{{ asset('images/sized/'.$image.'.webp') }}" alt=""><strong>{{ $code }}</strong><h1>{{ __($message) }}</h1>@php($detail = isset($exception) && (int) $code < 500 ? trim((string) $exception->getMessage()) : '')
+<p>{{ $detail !== '' ? __($detail) : __((int) $code >= 500 ? 'Please try again later.' : 'This action could not be completed.') }}</p>@if((int) $code >= 500 && \App\Support\ErrorReference::existing())<p class="ref">{{ __('Error reference') }}: <code dir="ltr">{{ \App\Support\ErrorReference::existing() }}</code></p>@endif<a href="{{ url('/') }}">{{ __('Return home') }}</a></main></body></html>

@@ -260,3 +260,7 @@ button.stat.school-pick span span{display:block;font-size:.78rem;color:var(--mut
 .hero-panel .hijri-badge{color:#fff;background:rgba(255,255,255,.2)}
 
 @media(max-width:760px){.admin-content{padding:18px 14px}.hero-panel{padding:22px 18px}.page-head{padding:16px}.nav-group:not(.nav-system) a{margin-inline-start:0}}
+
+/* Flat sidebar for staff and guardians */
+.nav-flat{display:grid;gap:2px;margin-top:6px}
+.nav-flat a{margin-inline-start:0!important;padding:11px 14px!important;font-size:.9rem!important}

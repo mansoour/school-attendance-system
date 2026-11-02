@@ -302,6 +302,25 @@ class SchoolAttendanceTest extends TestCase
             ->assertSee('nav-divider', false)->assertSee('school-switcher', false)->assertSee('Sample School · مديرة المدرسة: Saleha Hajla');
     }
 
+    public function test_header_principal_ignores_system_administrators_with_the_principal_role(): void
+    {
+        $admin = User::factory()->create(['name' => 'System Admin', 'school_id' => $this->school->id]);
+        $admin->assignRole(['owner', 'principal']);
+        $principal = $this->staff('principal');
+        $principal->update(['name' => 'Saleha Hajla']);
+        $this->actingAs($principal)->withSession(['locale' => 'ar'])->get(route('school.dashboard'))->assertOk()
+            ->assertSee('مديرة المدرسة: Saleha Hajla')->assertDontSee('مديرة المدرسة: System Admin');
+    }
+
+    public function test_student_affairs_can_add_a_student_that_all_staff_see(): void
+    {
+        $this->actingAs($this->staff('student_affairs'))->post(route('school.students.store'), ['name' => 'New Girl', 'classroom_id' => $this->classroom->id])->assertSessionHasNoErrors();
+        foreach (['principal', 'vice_principal', 'health_guide', 'counselor'] as $role) {
+            $this->actingAs($this->staff($role))->get(route('school.students.index'))->assertOk()->assertSee('New Girl');
+        }
+        $this->actingAs($this->staff('vice_principal'))->get(route('school.attendance.take', $this->classroom))->assertOk()->assertSee('New Girl');
+    }
+
     public function test_schools_page_is_for_the_system_administrator_only(): void
     {
         foreach (['principal', 'vice_principal', 'student_affairs', 'health_guide', 'counselor'] as $role) {

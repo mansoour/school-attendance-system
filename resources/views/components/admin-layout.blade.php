@@ -51,7 +51,7 @@ $allowed=fn($link)=>$link[3]===null || (str_starts_with($link[3],'role:') ? $use
 $inAdmin=request()->routeIs('admin.*');
 $isAdmin=$user->isSystemAdmin();
 $school=$context->school();
-$principalName=$school ? \App\Models\User::role('principal')->where('school_id',$school->id)->where('is_active',true)->value('name') : null;
+$principalName=$school ? \App\Models\User::role('principal')->whereDoesntHave('roles',fn($q)=>$q->where('name','owner'))->where('school_id',$school->id)->where('is_active',true)->orderBy('id')->value('name') : null;
 $heading=$school ? $school->name.($principalName ? ' · '.__('school.roles.principal').': '.$principalName : '') : ($isAdmin ? __('All schools') : __('Administration'));
 $roleName=$user->roles->pluck('name')->first(fn($r)=>in_array($r,['owner',...\App\School\Roles::all()]));
 @endphp

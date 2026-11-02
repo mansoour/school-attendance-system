@@ -20,6 +20,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Route;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Tests\TestCase;
@@ -260,6 +261,78 @@ class SchoolAttendanceTest extends TestCase
         $this->assertNull($linker->match('1000000001', 'Sara Ahmed', '0550000000'));
     }
 
+    public function test_student_affairs_manages_students_only_without_guardian_details(): void
+    {
+        $affairs = $this->staff('student_affairs');
+        $this->actingAs($affairs);
+        foreach (['school.classes.index', 'school.grades.index', 'school.employees.index', 'admin.index'] as $route) {
+            $this->get(route($route))->assertForbidden();
+        }
+        $this->get(route('school.students.create'))->assertOk()->assertDontSee('name="guardian_phone"', false);
+
+        // Class, phone, email and national ID are all optional.
+        $this->post(route('school.students.store'), ['name' => 'Only A Name'])->assertSessionHasNoErrors();
+        $created = Student::where('name', 'Only A Name')->sole();
+        $this->assertNull($created->national_id);
+        $this->assertNull($created->classroom_id);
+
+        // Guardian fields sent anyway are ignored for student affairs.
+        $this->student->update(['guardian_phone' => '0500000009']);
+        $this->put(route('school.students.update', $this->student), ['name' => 'Sara Ahmed', 'national_id' => '1000000001', 'guardian_phone' => '0511111111'])->assertSessionHasNoErrors();
+        $this->assertSame('0500000009', $this->student->fresh()->guardian_phone);
+
+        $principal = $this->staff('principal');
+        $this->actingAs($principal)->get(route('school.students.create'))->assertOk()->assertSee('name="guardian_phone"', false);
+        $this->get(route('school.classes.index'))->assertOk();
+    }
+
+    public function test_sidebar_shows_only_role_pages_and_system_settings_only_for_admin(): void
+    {
+        $health = $this->staff('health_guide');
+        $this->actingAs($health)->get(route('school.dashboard'))->assertOk()
+            ->assertSee('class="nav-flat"', false)->assertDontSee(route('school.students.create'), false)
+            ->assertDontSee(route('school.classes.index'), false)->assertDontSee('nav-divider', false)->assertDontSee('school-switcher', false);
+        $this->actingAs($this->staff('vice_principal'))->get(route('school.dashboard'))->assertOk()->assertDontSee('school-switcher', false);
+
+        $principal = $this->staff('principal');
+        $principal->update(['name' => 'Saleha Hajla']);
+        $owner = User::factory()->create();
+        $owner->assignRole('owner');
+        $this->actingAs($owner)->withSession(['school_id' => $this->school->id, 'locale' => 'ar'])->get(route('school.dashboard'))->assertOk()
+            ->assertSee('nav-divider', false)->assertSee('school-switcher', false)->assertSee('Sample School · مديرة المدرسة: Saleha Hajla');
+    }
+
+    public function test_only_one_sidebar_link_is_highlighted(): void
+    {
+        $this->actingAs($this->staff('student_affairs'));
+        foreach (['school.attendance.classes', 'school.attendance.index'] as $route) {
+            $html = $this->get(route($route))->assertOk()->getContent();
+            $this->assertSame(1, substr_count($html, 'aria-current="page"'), $route);
+            $this->assertMatchesRegularExpression('#href="'.preg_quote(route($route), '#').'"\s+aria-current="page"#', $html);
+        }
+    }
+
+    public function test_refused_actions_return_to_the_page_with_their_reason(): void
+    {
+        $principal = $this->staff('principal');
+        $grade = $this->classroom->grade;
+        $this->actingAs($principal)->withSession(['locale' => 'ar'])->from(route('school.grades.index'))
+            ->delete(route('school.grades.destroy', $grade))
+            ->assertRedirect(route('school.grades.index'))->assertSessionHasErrors('error');
+        $this->assertModelExists($grade);
+        $this->followingRedirects()->from(route('school.grades.index'))->delete(route('school.grades.destroy', $grade))
+            ->assertOk()->assertSee('انقلي الطالبات إلى فصل آخر قبل حذف هذا الصف.');
+    }
+
+    public function test_error_pages_show_their_reason_or_a_reference(): void
+    {
+        Route::middleware('web')->get('/_test/conflict', fn () => abort(409, 'Conflict reason'));
+        Route::middleware('web')->get('/_test/crash', fn () => throw new \RuntimeException('secret detail'));
+        config(['app.debug' => false]);
+        $this->get('/_test/conflict')->assertStatus(409)->assertSee('Conflict reason');
+        $this->get('/_test/crash')->assertStatus(500)->assertDontSee('secret detail')->assertSee('<code dir="ltr">', false);
+    }
+
     public function test_students_are_imported_from_excel(): void
     {
         $book = new Spreadsheet;
@@ -272,7 +345,7 @@ class SchoolAttendanceTest extends TestCase
         $path = tempnam(sys_get_temp_dir(), 'xlsx').'.xlsx';
         (new Xlsx($book))->save($path);
 
-        $this->actingAs($this->staff('student_affairs'))->post(route('school.students.import.store'), ['file' => new UploadedFile($path, 'students.xlsx', null, null, true), 'create_classes' => 1])->assertSessionHasNoErrors();
+        $this->actingAs($this->staff('principal'))->post(route('school.students.import.store'), ['file' => new UploadedFile($path, 'students.xlsx', null, null, true), 'create_classes' => 1])->assertSessionHasNoErrors();
 
         $new = Student::where('national_id', '2000000001')->sole();
         $this->assertSame('Fifth primary / B', $new->classroom->load('grade')->label());

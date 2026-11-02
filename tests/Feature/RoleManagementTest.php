@@ -66,7 +66,7 @@ class RoleManagementTest extends TestCase
         $this->withSession(['auth.password_confirmed_at' => time()]);
         $this->patch('/admin/roles/'.Role::findByName('owner')->id, ['name' => 'Changed'])->assertForbidden();
         $this->patch('/admin/roles/'.$role->id, ['name' => 'owner'])->assertForbidden();
-        $this->delete('/admin/roles/'.Role::findByName('owner')->id)->assertConflict();
+        $this->delete('/admin/roles/'.Role::findByName('owner')->id)->assertSessionHasErrors('error');
         $staff = User::factory()->create();
         $staff->assignRole('support');
         $this->actingAs($staff)->post('/admin/roles', ['name' => 'Changed'])->assertForbidden();

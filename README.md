@@ -11,10 +11,12 @@ A bilingual (Arabic-first, RTL) daily school attendance platform built with Lara
 | System administrator (`owner`) | مدير النظام | Full control: every school, all data, attendance, staff, system settings and notification rules |
 | Principal (`principal`) | مديرة المدرسة | Manages the whole school: staff accounts, grades, classes, students, attendance, excuses, reports and activity log |
 | Vice principal (`vice_principal`) | الوكيلة | Absence follow-up, attendance, excuse review, guardian communication, notes and reports (no staff or structure management) |
-| Student affairs (`student_affairs`) | شؤون الطالبات | Grades and classes, students (add, edit, delete, assign to class, Excel import), daily attendance, excuses and guardian contact |
+| Student affairs (`student_affairs`) | شؤون الطالبات | Students only (add, edit, delete, assign to class, Excel import; guardian details are managed by the principal), daily attendance, excuses and guardian contact. Grades, classes and staff belong to the principal and system administrator |
 | Health advisor (`health_guide`) | الموجهة الصحية | Views absences, adds and reviews excuses, records health notes |
 | Student counselor (`counselor`) | الموجهة الطلابية | Follows absence causes, counseling notes and guidance plans, guardian contact and reports |
 | Guardian (`guardian`) | ولي الأمر | Follows linked children's attendance, sends excuses with attachments, reads shared notes and notifications |
+
+Each role sees a short sidebar with only its own pages; notifications and the account menu live in the top bar, and **System settings** is visible to the system administrator only. Refused actions return to the page with the reason shown, and server errors show a reference code that is also written to the log.
 
 Default grants are seeded once and remain editable from **System settings → Roles**. Every permission is enforced on the server and all school data is scoped to the user's school.
 

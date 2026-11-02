@@ -200,7 +200,7 @@ class StarterKitTest extends TestCase
     public function test_owner_role_cannot_be_deleted(): void
     {
         $this->actingAs($this->staff())->withSession(['auth.password_confirmed_at' => time()]);
-        $this->delete('/admin/roles/'.Role::findByName('owner')->id)->assertConflict();
+        $this->delete('/admin/roles/'.Role::findByName('owner')->id)->assertSessionHasErrors('error');
         $this->post('/admin/roles', ['name' => 'owner', 'permissions' => []])->assertForbidden();
     }
 

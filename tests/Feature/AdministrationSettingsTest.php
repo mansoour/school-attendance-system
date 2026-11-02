@@ -87,7 +87,7 @@ class AdministrationSettingsTest extends TestCase
         $this->actingAs($this->owner());
         $this->post('/admin/languages', ['code' => 'fr', 'name' => 'French', 'native_name' => 'Français', 'direction' => 'ltr', 'plural_forms' => 2])->assertSessionHasNoErrors();
         $this->getJson('/api/v1/catalogs/fr')->assertNotFound();
-        $this->post('/admin/languages/fr/toggle')->assertUnprocessable();
+        $this->post('/admin/languages/fr/toggle')->assertSessionHasErrors('error');
         $this->post('/admin/translations', ['locale' => 'fr', 'rows' => [['key' => 'Welcome', 'value' => 'Bonjour']]])->assertSessionHasNoErrors();
         $draft = TranslationRevision::firstOrFail();
         $this->get('/?preview_translation='.$draft->id)->assertOk()->assertSee('lang="fr"', false);
@@ -96,7 +96,7 @@ class AdministrationSettingsTest extends TestCase
         $this->getJson('/api/v1/catalogs/fr')->assertJsonPath('messages.Welcome', 'Bonjour');
         $this->post('/locale', ['locale' => 'fr'])->assertSessionHasNoErrors();
         $this->get('/login')->assertRedirect();
-        $this->post('/admin/languages/en/toggle')->assertUnprocessable();
+        $this->post('/admin/languages/en/toggle')->assertSessionHasErrors('error');
         $this->get('/admin/translations')->assertOk()->assertDontSee('Messages (JSON)');
     }
 

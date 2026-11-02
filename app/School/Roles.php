@@ -13,7 +13,7 @@ class Roles
         'grades.manage', 'classes.manage', 'students.view', 'students.manage', 'students.import',
         'attendance.view', 'attendance.take', 'excuses.view', 'excuses.review', 'excuses.submit',
         'notes.view', 'notes.manage', 'communication.access', 'reports.view', 'reports.export',
-        'guardians.approve', 'guardian.portal',
+        'guardians.approve', 'guardian.portal', 'students.guardian_details',
     ];
 
     /** Roles a principal may assign when creating employee accounts. */
@@ -26,7 +26,7 @@ class Roles
         return [
             'principal' => array_values(array_diff(self::PERMISSIONS, ['schools.manage', 'excuses.submit', 'guardian.portal'])),
             'vice_principal' => [...$staffCore, 'attendance.take', 'excuses.review', 'notes.manage', 'communication.access', 'reports.export', 'guardians.approve'],
-            'student_affairs' => [...$staffCore, 'grades.manage', 'classes.manage', 'students.manage', 'students.import', 'attendance.take', 'excuses.review', 'notes.manage', 'communication.access', 'reports.export', 'guardians.approve'],
+            'student_affairs' => [...$staffCore, 'students.manage', 'students.import', 'attendance.take', 'excuses.review', 'notes.manage', 'communication.access', 'reports.export', 'guardians.approve'],
             'health_guide' => [...$staffCore, 'excuses.review', 'notes.manage'],
             'counselor' => [...$staffCore, 'notes.manage', 'communication.access', 'reports.export'],
             'guardian' => ['school.access', 'guardian.portal', 'excuses.submit'],

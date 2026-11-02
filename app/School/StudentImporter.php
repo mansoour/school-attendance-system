@@ -44,8 +44,8 @@ class StudentImporter
             }
         }
         $result = ['created' => 0, 'updated' => 0, 'errors' => []];
-        if (! isset($map['name'], $map['national_id'])) {
-            $result['errors'][] = __('The sheet must include the student name and national ID columns.');
+        if (! isset($map['name'])) {
+            $result['errors'][] = __('The sheet must include the student name column.');
 
             return $result;
         }
@@ -62,7 +62,7 @@ class StudentImporter
                     continue;
                 }
                 $validator = Validator::make($data, [
-                    'name' => 'required|string|max:200', 'national_id' => 'required|string|max:20',
+                    'name' => 'required|string|max:200', 'national_id' => 'nullable|string|max:20',
                     'email' => 'nullable|email|max:200', 'guardian_email' => 'nullable|email|max:200',
                     'phone' => 'nullable|string|max:40', 'guardian_phone' => 'nullable|string|max:40', 'guardian_name' => 'nullable|string|max:200',
                 ]);
@@ -71,7 +71,10 @@ class StudentImporter
 
                     continue;
                 }
-                $student = Student::where('national_id', $data['national_id'])->first();
+                // Match by national ID; students without one are matched by name within the school.
+                $student = ($data['national_id'] ?? null)
+                    ? Student::where('national_id', $data['national_id'])->first()
+                    : Student::where('school_id', $schoolId)->whereNull('national_id')->where('name', $data['name'])->first();
                 if ($student && $student->school_id !== $schoolId) {
                     $result['errors'][] = __('Row :row: this national ID belongs to a student in another school.', ['row' => $line]);
 
@@ -89,7 +92,7 @@ class StudentImporter
                     $student->update($attributes);
                     $result['updated']++;
                 } else {
-                    Student::create($attributes + ['school_id' => $schoolId, 'national_id' => $data['national_id']]);
+                    Student::create($attributes + ['school_id' => $schoolId, 'national_id' => $data['national_id'] ?? null]);
                     $result['created']++;
                 }
             }

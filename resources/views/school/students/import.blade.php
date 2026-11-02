@@ -6,13 +6,13 @@
 <form method="post" action="{{ route('school.students.import.store') }}" enctype="multipart/form-data" class="card">@csrf
 <h2><x-ui-icon name="upload"/>{{ __('Upload file') }}</h2>
 <label class="field">{{ __('Excel or CSV file') }}<input type="file" name="file" accept=".xlsx,.xls,.csv" required></label>
-<label class="check-row" style="margin-top:12px"><input type="checkbox" name="create_classes" value="1" checked>{{ __('Create missing grades and classes automatically') }}</label>
+@can('classes.manage')<label class="check-row" style="margin-top:12px"><input type="checkbox" name="create_classes" value="1" checked>{{ __('Create missing grades and classes automatically') }}</label>@endcan
 <div class="form-actions"><button><x-ui-icon name="upload"/>{{ __('Import') }}</button></div>
 </form>
 <section class="card"><h2><x-ui-icon name="file-spreadsheet"/>{{ __('Accepted columns') }}</h2>
-<p class="small">{{ __('The first row must contain column headers. Name and national ID are required.') }}</p>
+<p class="small">{{ __('The first row must contain column headers. Only the student name is required.') }}</p>
 <div class="table-wrap"><table><thead><tr><th>{{ __('Field') }}</th><th>{{ __('Accepted headers') }}</th></tr></thead><tbody>
-@foreach($columns as $key=>$aliases)<tr><td><strong>{{ $aliases[0] }}</strong>@if(in_array($key,['name','national_id'])) *@endif</td><td class="small muted">{{ implode('، ',$aliases) }}</td></tr>@endforeach
+@foreach($columns as $key=>$aliases)<tr><td><strong>{{ $aliases[0] }}</strong>@if($key==='name') *@endif</td><td class="small muted">{{ implode('، ',$aliases) }}</td></tr>@endforeach
 </tbody></table></div></section>
 </div>
 </x-admin-layout>

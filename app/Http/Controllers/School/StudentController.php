@@ -110,7 +110,7 @@ class StudentController extends Controller
     {
         $schoolId = $this->context()->requireId();
         $request->validate(['file' => 'required|file|mimes:xlsx,xls,csv,txt|max:5120']);
-        $result = $importer->import($request->file('file')->getRealPath(), $schoolId, $request->boolean('create_classes'));
+        $result = $importer->import($request->file('file')->getRealPath(), $schoolId, $request->boolean('create_classes') && $request->user()->can('classes.manage'));
 
         return back()->with('status', __('Import finished: :created added, :updated updated.', ['created' => $result['created'], 'updated' => $result['updated']]))->with('import_errors', $result['errors']);
     }
@@ -119,7 +119,7 @@ class StudentController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:200',
-            'national_id' => ['required', 'string', 'max:20', Rule::unique('students')->ignore($student?->id)],
+            'national_id' => ['nullable', 'string', 'max:20', Rule::unique('students')->ignore($student?->id)],
             'classroom_id' => ['nullable', 'integer', Rule::exists('classrooms', 'id')->where('school_id', $schoolId)],
             'email' => 'nullable|email|max:200',
             'phone' => 'nullable|string|max:40',
@@ -130,6 +130,10 @@ class StudentController extends Controller
             'is_active' => 'boolean',
         ]);
         $data['is_active'] = $request->boolean('is_active', true);
+        if (! $request->user()->can('students.guardian_details')) {
+            // Student affairs records student details only; guardian contact stays as it is.
+            unset($data['guardian_name'], $data['guardian_phone'], $data['guardian_email'], $data['guardian_relation']);
+        }
 
         return $data;
     }

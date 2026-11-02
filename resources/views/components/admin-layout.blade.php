@@ -8,6 +8,7 @@ $schoolGroups=[
  ['Dashboard','house','teal',[
   ['Overview','layout-dashboard',route('school.dashboard'),'attendance.view'],
   ['My children','heart-handshake',route('school.guardian.index'),'role:guardian'],
+  ['Reports and statistics','chart-column',route('school.reports.index'),'reports.view'],
  ]],
  ['Attendance','calendar-check','violet',[
   ['Attendance tracking','calendar-check',route('school.attendance.index'),'attendance.view'],
@@ -19,7 +20,6 @@ $schoolGroups=[
   ['Guardian communication','message-circle',route('school.communication.index'),'communication.access'],
  ]],
  ['Reports','chart-column','amber',[
-  ['Reports and statistics','chart-column',route('school.reports.index'),'reports.view'],
   ['Activity log','history',route('school.activity'),'audit.view'],
  ]],
  ['School management','school','blue',[

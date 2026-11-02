@@ -264,3 +264,10 @@ button.stat.school-pick span span{display:block;font-size:.78rem;color:var(--mut
 /* Flat sidebar for staff and guardians */
 .nav-flat{display:grid;gap:2px;margin-top:6px}
 .nav-flat a{margin-inline-start:0!important;padding:11px 14px!important;font-size:.9rem!important}
+
+/* Arabic pages: every text field is right-to-left, including national ID, phone and email
+   fields that carry dir="ltr" for their content. Numbers and emails still read correctly. */
+html[dir=rtl] input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+html[dir=rtl] textarea,
+html[dir=rtl] select{direction:rtl!important;text-align:right!important}
+html[dir=rtl] input::placeholder,html[dir=rtl] textarea::placeholder{text-align:right}

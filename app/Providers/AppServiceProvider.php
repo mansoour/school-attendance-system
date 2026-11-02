@@ -39,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // @date($value), @dateLong($value) and @dateTime($value): Hijri with Gregorian alongside.
+        // Cloudflare Rocket Loader rewrites scripts and breaks Alpine (menus, dropdowns); opt the app's scripts out.
+        \Illuminate\Support\Facades\Vite::useScriptTagAttributes(['data-cfasync' => 'false']);
         Blade::directive('date', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e); ?>");
         Blade::directive('dateLong', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e, true); ?>");
         Blade::directive('dateTime', fn ($e) => "<?php echo \\App\\Support\\Dates::html($e, false, true); ?>");

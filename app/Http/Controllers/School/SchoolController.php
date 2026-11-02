@@ -11,6 +11,7 @@ class SchoolController extends Controller
 {
     public function switch(Request $request)
     {
+        $this->systemAdminOnly();
         $data = $request->validate(['school_id' => 'nullable|integer|exists:schools,id']);
         session(['school_id' => $data['school_id'] ?? null]);
 
@@ -19,11 +20,13 @@ class SchoolController extends Controller
 
     public function index()
     {
+        $this->systemAdminOnly();
         return view('school.schools', ['schools' => School::withCount(['students', 'classrooms', 'users'])->orderBy('name')->get()]);
     }
 
     public function store(Request $request)
     {
+        $this->systemAdminOnly();
         $school = School::create($this->validated($request));
         session(['school_id' => $school->id]);
 
@@ -32,6 +35,7 @@ class SchoolController extends Controller
 
     public function update(Request $request, School $school)
     {
+        $this->systemAdminOnly();
         $school->update($this->validated($request, $school));
 
         return back()->with('status', __('Saved.'));
@@ -39,6 +43,7 @@ class SchoolController extends Controller
 
     public function destroy(School $school)
     {
+        $this->systemAdminOnly();
         abort_if($school->students()->exists(), 409, __('Remove or move the students before deleting the school.'));
         $school->delete();
         if ((int) session('school_id') === $school->id) {
@@ -88,5 +93,11 @@ class SchoolController extends Controller
         }
 
         return $data;
+    }
+
+    /** Managing schools is reserved for the system administrator, whatever permissions other roles hold. */
+    private function systemAdminOnly(): void
+    {
+        abort_unless(request()->user()?->isSystemAdmin(), 403);
     }
 }

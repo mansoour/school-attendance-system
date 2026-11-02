@@ -302,6 +302,22 @@ class SchoolAttendanceTest extends TestCase
             ->assertSee('nav-divider', false)->assertSee('school-switcher', false)->assertSee('Sample School · مديرة المدرسة: Saleha Hajla');
     }
 
+    public function test_schools_page_is_for_the_system_administrator_only(): void
+    {
+        foreach (['principal', 'vice_principal', 'student_affairs', 'health_guide', 'counselor'] as $role) {
+            $this->actingAs($this->staff($role))->get(route('school.schools.index'))->assertForbidden();
+        }
+        // Even a role granted the permission by mistake cannot manage schools.
+        \Spatie\Permission\Models\Role::findByName('principal')->givePermissionTo('schools.manage');
+        $principal = $this->staff('principal');
+        $this->actingAs($principal)->get(route('school.schools.index'))->assertForbidden();
+        $this->post(route('school.schools.store'), ['name' => 'X', 'day_starts_at' => '07:00', 'late_after_minutes' => 15])->assertForbidden();
+
+        $owner = User::factory()->create();
+        $owner->assignRole('owner');
+        $this->actingAs($owner)->get(route('school.schools.index'))->assertOk();
+    }
+
     public function test_only_one_sidebar_link_is_highlighted(): void
     {
         $this->actingAs($this->staff('student_affairs'));

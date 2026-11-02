@@ -50,10 +50,6 @@ $isActive=fn($url)=>$url===$activeUrl;
 $allowed=fn($link)=>$link[3]===null || (str_starts_with($link[3],'role:') ? $user->hasRole(substr($link[3],5)) : $user->can($link[3]));
 $inAdmin=request()->routeIs('admin.*');
 $isAdmin=$user->isSystemAdmin();
-// Staff and guardians see one short list of their own pages; the system administrator keeps the groups.
-// Ordered by daily use: home, attendance, follow-up, students, reports, then setup pages.
-$flatOrder=['Overview','My children','Class attendance','Attendance tracking','Excuses','Guardian communication','Student notes','Students','Guardian accounts','Reports and statistics','Activity log','Employees','Classes','Grades','School settings','Schools'];
-$flatLinks=collect($schoolGroups)->flatMap(fn($group)=>array_filter($group[3],$allowed))->sortBy(fn($link)=>array_search($link[0],$flatOrder))->values();
 $school=$context->school();
 $principalName=$school ? \App\Models\User::role('principal')->where('school_id',$school->id)->where('is_active',true)->value('name') : null;
 $heading=$school ? $school->name.($principalName ? ' · '.__('school.roles.principal').': '.$principalName : '') : ($isAdmin ? __('All schools') : __('Administration'));
@@ -63,9 +59,6 @@ $roleName=$user->roles->pluck('name')->first(fn($r)=>in_array($r,['owner',...\Ap
 @if($user->isSystemAdmin() && $user->can('school.access'))
 <form method="post" action="{{ route('school.switch') }}" class="school-switcher">@csrf<label for="school-switch"><x-ui-icon name="building-2"/>{{ __('Active school') }}</label><select id="school-switch" name="school_id" onchange="this.form.submit()"><option value="">{{ __('All schools') }}</option>@foreach(\App\Models\School::orderBy('name')->get() as $option)<option value="{{ $option->id }}" @selected((int) session('school_id')===$option->id)>{{ $option->name }}</option>@endforeach</select><noscript><button class="secondary small">{{ __('Switch') }}</button></noscript></form>
 @endif
-@if(!$isAdmin)
-<nav class="nav-flat">@foreach($flatLinks as [$linkLabel,$icon,$url,$permission])<a href="{{ $url }}" @if($isActive($url)) aria-current="page" @endif><x-ui-icon :name="$icon"/><span>{{ __($linkLabel) }}</span></a>@endforeach</nav>
-@else
 @foreach($schoolGroups as [$label,$groupIcon,$tone,$links])
 @php($links=array_values(array_filter($links,$allowed)))
 @if(count($links)===1)<nav class="nav-flat"><a href="{{ $links[0][2] }}" @if($isActive($links[0][2])) aria-current="page" @endif><x-ui-icon :name="$links[0][1]"/><span>{{ __($links[0][0]) }}</span></a></nav>
@@ -73,7 +66,6 @@ $roleName=$user->roles->pluck('name')->first(fn($r)=>in_array($r,['owner',...\Ap
 <a href="{{ $url }}" @if($isActive($url)) aria-current="page" @endif><x-ui-icon :name="$icon"/><span>{{ __($linkLabel) }}</span></a>
 @endforeach</details>@endif
 @endforeach
-@endif
 @if($isAdmin)
 <p class="nav-divider"><x-ui-icon name="settings"/>{{ __('System settings') }}</p>
 @foreach($groups as $label=>$links)

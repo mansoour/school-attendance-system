@@ -38,6 +38,9 @@ Thumbs.db
 AGENTS.md
 /.agents/
 /.codex/
+personal-notes.md
+/students_names/
+students_names
 
 # Installation data, exports and uploaded content
 *.sqlite

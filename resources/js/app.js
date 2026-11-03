@@ -81,7 +81,9 @@ if (sidebar) {
     });
     const active = sidebar.querySelector('[aria-current="page"]');
     if (active) {
-        active.closest('details').open = true;
+        // Single-item groups render as a plain link outside any <details>.
+        const group = active.closest('details');
+        if (group) group.open = true;
         requestAnimationFrame(() => { const position = active.getBoundingClientRect().top - sidebar.getBoundingClientRect().top; sidebar.scrollTop += position - sidebar.clientHeight / 2 + active.clientHeight / 2; });
     }
 }

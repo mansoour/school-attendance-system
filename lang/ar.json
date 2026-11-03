@@ -1156,5 +1156,11 @@
   "This action could not be completed.": "تعذر إتمام هذا الإجراء.",
   "Error reference": "رقم مرجع الخطأ",
   "The request could not be completed": "تعذر إتمام الطلب",
-  "This action is unauthorized.": "ليست لديك صلاحية لتنفيذ هذا الإجراء."
+  "This action is unauthorized.": "ليست لديك صلاحية لتنفيذ هذا الإجراء.",
+  "Showing": "عرض",
+  "to": "إلى",
+  "of": "من أصل",
+  "results": "نتيجة",
+  "Go to page :page": "الانتقال إلى الصفحة :page",
+  "Pagination Navigation": "التنقل بين الصفحات"
 }

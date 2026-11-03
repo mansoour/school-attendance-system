@@ -321,6 +321,16 @@ class SchoolAttendanceTest extends TestCase
         $this->actingAs($this->staff('vice_principal'))->get(route('school.attendance.take', $this->classroom))->assertOk()->assertSee('New Girl');
     }
 
+    public function test_pagination_is_in_arabic(): void
+    {
+        foreach (range(1, 35) as $n) {
+            Student::create(['school_id' => $this->school->id, 'name' => 'Student '.$n, 'national_id' => (string) (2000000000 + $n)]);
+        }
+        $this->actingAs($this->staff('principal'))->withSession(['locale' => 'ar'])->get(route('school.students.index'))->assertOk()
+            ->assertSee('عرض')->assertSee('من أصل')->assertSee('نتيجة')->assertDontSee('Showing')->assertDontSee('results');
+        $this->assertSame([], DB::table('missing_translations')->where('locale', 'ar')->pluck('key')->all());
+    }
+
     public function test_schools_page_is_for_the_system_administrator_only(): void
     {
         foreach (['principal', 'vice_principal', 'student_affairs', 'health_guide', 'counselor'] as $role) {
